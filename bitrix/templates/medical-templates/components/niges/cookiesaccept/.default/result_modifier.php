@@ -8,14 +8,8 @@ if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) {
 require_once $_SERVER['DOCUMENT_ROOT'] . '/local/php_interface/include/legal/legal_export_helpers.php';
 $legal = include $_SERVER['DOCUMENT_ROOT'] . '/local/php_interface/include/legal/config.php';
 
-$mainText = 'Мы используем файлы '
-    . legal_doc_link_nofollow($legal, 'cookie', 'cookies')
-    . ' для улучшения работы сайта, настройки рекламы и анализа посещаемости. Продолжая пользоваться сайтом, вы даёте '
-    . legal_doc_link_nofollow($legal, 'consent', 'согласие на обработку персональных данных')
-    . ', соглашаетесь с '
-    . legal_doc_link_nofollow($legal, 'personal_data', 'политикой обработки персональных данных')
-    . ' и ознакомлены с '
-    . legal_doc_link_nofollow($legal, 'recommendation', 'правилами применения рекомендательных технологий')
+$mainText = 'Этот сайт использует cookie-файлы для настройки рекламы и сбора статистики. Оставаясь на сайте, вы соглашаетесь на обработку ваших персональных данных в соответствии с нашей '
+    . legal_doc_link_nofollow($legal, 'cookie', 'политикой cookie')
     . '.';
 
 $arResult['MAINTEXT'] = CNigesCookiesAcceptHelper::sanitizeHtml($mainText);
