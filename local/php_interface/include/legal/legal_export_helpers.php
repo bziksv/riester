@@ -45,7 +45,18 @@ function legal_doc_href(array $legal, string $key): string
     return (string) ($legal['images'][$key] ?? '');
 }
 
+function legal_doc_link(array $legal, string $key, ?string $text = null): string
+{
+    return legal_link(legal_doc_href($legal, $key), $text);
+}
+
+function legal_doc_link_nofollow(array $legal, string $key, string $text): string
+{
+    return '<a href="' . legal_h(legal_doc_href($legal, $key)) . '" target="_blank" rel="nofollow noopener">' . legal_h($text) . '</a>';
+}
+
 function legal_doc_internal_link(array $legal, string $key): string
 {
     return legal_internal_link(legal_doc_href($legal, $key), $legal['site_host']);
 }
+
