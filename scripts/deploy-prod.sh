@@ -42,7 +42,14 @@ ssh "$HOST" "cd $PROD_PATH &&
     echo \"ERROR: prod FETCH_HEAD=\$DEPLOY_REV, expected $PUSHED_REV\" >&2
     exit 1
   fi
+  PREV_REV=\$(cat .deploy-revision 2>/dev/null || echo '')
   GIT_TERMINAL_PROMPT=0 git checkout FETCH_HEAD -- .
+  if [ -n \"\$PREV_REV\" ] && [ \"\$PREV_REV\" != \"\$DEPLOY_REV\" ]; then
+    git diff --name-only --diff-filter=D \"\$PREV_REV\" \"\$DEPLOY_REV\" | while IFS= read -r f; do
+      [ -n \"\$f\" ] && rm -f \"\$f\"
+    done
+  fi
+  rm -f upload/cookies-riester.png upload/politics-riester.png upload/compliance-riester.png upload/rules-recommendation-riester.png
   echo \"\$DEPLOY_REV\" > .deploy-revision
   if [ ! -f bitrix/license_key.php ] && [ -f /tmp/riester_license_key.php.bak ]; then
     cp -a /tmp/riester_license_key.php.bak bitrix/license_key.php

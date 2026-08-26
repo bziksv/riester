@@ -1696,21 +1696,74 @@ BX.namespace('BX.Sale.OrderAjaxComponent');
 		 */
 		clickOrderSaveAction: function(event)
 		{
+			this.disallowOrderSave();
+			this.endLoader();
+
+			if (!this.isCustomConsentChecked())
+			{
+				this.showCustomConsentError();
+				return BX.PreventDefault(event);
+			}
+
+			this.hideCustomConsentError();
+
 			if (this.isValidForm())
 			{
 				this.allowOrderSave();
-
-				if (this.params.USER_CONSENT === 'Y' && BX.UserConsent)
-				{
-					BX.onCustomEvent('bx-soa-order-save', []);
-				}
-				else
-				{
-					this.doSaveAction();
-				}
+				this.doSaveAction();
 			}
 
 			return BX.PreventDefault(event);
+		},
+
+		getCustomConsentCheckbox: function()
+		{
+			return this.orderSaveBlockNode
+				? this.orderSaveBlockNode.querySelector('#bx-soa-custom-consent')
+				: null;
+		},
+
+		isCustomConsentChecked: function()
+		{
+			var checkbox = this.getCustomConsentCheckbox();
+			return checkbox ? checkbox.checked : true;
+		},
+
+		showCustomConsentError: function()
+		{
+			var wrap = BX('bx-soa-custom-consent-wrap'),
+				errorNode = wrap ? wrap.querySelector('.bx-soa-consent-error') : null;
+
+			if (wrap)
+			{
+				BX.addClass(wrap, 'has-error');
+			}
+
+			if (errorNode)
+			{
+				errorNode.style.display = 'block';
+			}
+
+			if (this.orderSaveBlockNode)
+			{
+				this.animateScrollTo(this.orderSaveBlockNode, 800, 50);
+			}
+		},
+
+		hideCustomConsentError: function()
+		{
+			var wrap = BX('bx-soa-custom-consent-wrap'),
+				errorNode = wrap ? wrap.querySelector('.bx-soa-consent-error') : null;
+
+			if (wrap)
+			{
+				BX.removeClass(wrap, 'has-error');
+			}
+
+			if (errorNode)
+			{
+				errorNode.style.display = 'none';
+			}
 		},
 
 		doSaveAction: function()
