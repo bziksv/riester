@@ -97,7 +97,7 @@
 		$riesterLegal = include $_SERVER['DOCUMENT_ROOT'] . '/local/php_interface/include/legal/config.php';
 		$legalUrls = $riesterLegal['images'];
 		?>
-		<div class="cookies-info"><noindex>Этот сайт использует cookie-файлы для настройки рекламы и сбора статистики. Оставаясь на сайте, вы соглашаетесь на обработку ваших персональных данных в соответствии с нашей <a target="_blank" rel="nofollow noopener" style="color: #fff;" href="<?= htmlspecialcharsbx($legalUrls['cookie']) ?>">политикой cookie</a>.</noindex></div>
+		<div class="cookies-info"><noindex>Наш сайт использует cookies для обеспечения работоспособности и сбора статистики. С их помощью мы анализируем пользовательскую активность, улучшаем работу сайта и делаем рекламу более релевантной. Оставаясь на сайте, вы даёте согласие на обработку ваших персональных данных в соответствии с <a target="_blank" rel="nofollow noopener" style="color: #fff;" href="<?= htmlspecialcharsbx($legalUrls['consent']) ?>">Согласием на обработку персональных данных</a>. Подробнее об обработке персональных данных — в <a target="_blank" rel="nofollow noopener" style="color: #fff;" href="<?= htmlspecialcharsbx($legalUrls['personal_data']) ?>">Политике обработки персональных данных</a>. Вы можете отключить сохранение cookies в настройках браузера в любой момент. На сайте также применяются <a target="_blank" rel="nofollow noopener" style="color: #fff;" href="<?= htmlspecialcharsbx($legalUrls['recommendation']) ?>">рекомендательные технологии</a>.</noindex></div>
     </div>
 </div>
 
