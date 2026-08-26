@@ -1,0 +1,34 @@
+{
+  "generatedAt": "2026-08-26T21:18:29.968Z",
+  "baseUrl": "http://127.0.0.1:8103",
+  "documents": [
+    {
+      "title": "riester-soglasie-obrabotki-pd",
+      "image": "/upload/legal/legal-consent.png",
+      "imageUrl": "http://127.0.0.1:8103/upload/legal/legal-consent.png",
+      "printUrl": "http://127.0.0.1:8103/legal/print/riester-soglasie-obrabotki-pd/",
+      "file": "upload/legal/legal-consent.png"
+    },
+    {
+      "title": "riester-politika-obrabotki-pd",
+      "image": "/upload/legal/legal-personal-data.png",
+      "imageUrl": "http://127.0.0.1:8103/upload/legal/legal-personal-data.png",
+      "printUrl": "http://127.0.0.1:8103/legal/print/riester-politika-obrabotki-pd/",
+      "file": "upload/legal/legal-personal-data.png"
+    },
+    {
+      "title": "riester-politika-cookie",
+      "image": "/upload/legal/legal-cookie.png",
+      "imageUrl": "http://127.0.0.1:8103/upload/legal/legal-cookie.png",
+      "printUrl": "http://127.0.0.1:8103/legal/print/riester-politika-cookie/",
+      "file": "upload/legal/legal-cookie.png"
+    },
+    {
+      "title": "riester-pravila-rekomendatelnyh-tehnologiy",
+      "image": "/upload/legal/legal-recommendation.png",
+      "imageUrl": "http://127.0.0.1:8103/upload/legal/legal-recommendation.png",
+      "printUrl": "http://127.0.0.1:8103/legal/print/riester-pravila-rekomendatelnyh-tehnologiy/",
+      "file": "upload/legal/legal-recommendation.png"
+    }
+  ]
+}

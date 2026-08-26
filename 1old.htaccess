@@ -1,0 +1,86 @@
+Options -Indexes 
+ErrorDocument 404 /404.php
+
+<Files ~ "(html_editor_action|upload|virtual_file_system).php$">
+	Order Deny,Allow
+	Deny from all
+	Allow from 178.250.157.140
+</Files>
+
+<IfModule mod_php5.c>
+  php_flag session.use_trans_sid off
+  #php_flag default_charset UTF-8
+  php_value display_errors 1
+  php_value opcache.revalidate_freq 0
+  php_value max_input_vars 10000
+  php_value mbstring.func_overload 2
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  Options +FollowSymLinks
+  RewriteEngine On
+
+############могут быть проблемы с ajax не забудь что тут писал!!!!
+  RewriteCond %{THE_REQUEST} /(.*)index.php.*$
+  RewriteCond %{THE_REQUEST} !bitrix/admin/
+  RewriteRule .* /%1 [R=301,L]
+############
+
+RewriteCond %{HTTP_HOST} ^www\.(.*) [NC]
+RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+  
+RewriteEngine On
+RewriteCond %{HTTPS} =off
+RewriteCond %{REQUEST_URI} !^/bitrix/admin/1c_exchange.php
+RewriteCond %{REQUEST_URI} !^/hand1CtoSite.php
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+  
+#добавить / если его нет 
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} !(.*)/$
+RewriteRule ^(.*[^/])$ $1/ [L,R=301]
+
+#убрать //
+RewriteCond %{THE_REQUEST} ([^\s]*)\/{2,}(\?[^\s]*)?
+RewriteRule (.*) %1 [R=301,L]
+
+#пробелы //
+#RewriteCond %{THE_REQUEST} ([^\s]*)(\s|%20)(\?[^\s]*)?
+#RewriteRule (.*) $1 [R=302,L]
+   
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -l [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteCond %{REQUEST_FILENAME} [\xC2-\xDF][\x80-\xBF] [OR]
+RewriteCond %{REQUEST_FILENAME} \xE0[\xA0-\xBF][\x80-\xBF] [OR]
+RewriteCond %{REQUEST_FILENAME} [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2} [OR]
+RewriteCond %{REQUEST_FILENAME} \xED[\x80-\x9F][\x80-\xBF] [OR]
+RewriteCond %{REQUEST_FILENAME} \xF0[\x90-\xBF][\x80-\xBF]{2} [OR]
+RewriteCond %{REQUEST_FILENAME} [\xF1-\xF3][\x80-\xBF]{3} [OR]
+RewriteCond %{REQUEST_FILENAME} \xF4[\x80-\x8F][\x80-\xBF]{2}
+RewriteCond %{REQUEST_FILENAME} !/bitrix/virtual_file_system.php$
+RewriteRule ^(.*)$ /bitrix/virtual_file_system.php [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-l
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !/bitrix/urlrewrite.php$
+  RewriteRule ^(.*)$ /bitrix/urlrewrite.php [L]
+  RewriteRule .* - [E=REMOTE_USER:%{HTTP:Authorization}]
+</IfModule>
+
+<IfModule mod_dir.c>
+  DirectoryIndex index.php index.html
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive on
+  ExpiresByType image/jpeg "access plus 3 day"
+  ExpiresByType image/gif "access plus 3 day"
+  ExpiresByType image/png "access plus 3 day"
+  ExpiresByType text/css "access plus 3 day"
+  ExpiresByType application/javascript "access plus 3 day"  
+</IfModule>
+
+#Redirect 301 /catalog/pulsoksimetry-riester-germaniya/ /catalog/pulsoksimetry-riester-germaniya/1pulsoksimetr-1905-ri-fox-riester-germaniya/
