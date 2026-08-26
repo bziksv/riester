@@ -1,8 +1,6 @@
 <? if(!$arCityes = include $_SERVER['DOCUMENT_ROOT'].'/.cityes.php') return false; ?>
 
-
-
-<div class="mfeedback-p" id="location" style="max-width: 500px;">
+<div class="mfeedback-p" id="location">
     <span class="button b-close"><span>&times;</span></span>
     <div class="mfeedback-p-head">Выбор города</div>
 
@@ -30,8 +28,17 @@
     </div>
     <? endif; ?>
 </div>
-<?/*
+
 <style>
+    #location {
+        display: none;
+        width: 92%;
+        max-width: 520px;
+        max-height: 80vh;
+        overflow-y: auto;
+        text-align: left;
+    }
+
     .city .item-city {
         display: flex;
         flex-wrap: wrap;
@@ -59,21 +66,36 @@
         display: flex;
     }
 </style>
-*/?>
+
 <script>
-    $('#location_btn').click(function(){
-        $('#location').bPopup({
-            zIndex:1000,
-            position: ['auto', 50]
+    (function($) {
+        var locationPopupApi = null;
+
+        $('#location_btn').on('click', function(e) {
+            e.preventDefault();
+            if ($('#location').is(':visible')) {
+                return false;
+            }
+
+            locationPopupApi = $('#location').bPopup({
+                zIndex: 10100,
+                position: ['auto', 'auto'],
+                modalClose: true,
+                follow: [false, false]
+            });
+            return false;
         });
-    });
 
-    $('.city .item-city a.c').click(function(){
-        var city = $(this).text();
-        document.cookie = "city=" + city + "; path=/;";
-        $('#location_btn').html(city + '<i class="icon-arrow_down" style="transform: none;"></i>');
+        $('.city .item-city a.c').on('click', function() {
+            var city = $(this).text();
+            document.cookie = "city=" + encodeURIComponent(city) + "; path=/; max-age=31536000";
+            $('#location_btn').html(city + '<i class="icon-arrow_down" style="transform: none;"></i>');
 
-        var bPopup = $('#location').bPopup();
-        bPopup.close();
-    });
+            if (locationPopupApi && typeof locationPopupApi.close === 'function') {
+                locationPopupApi.close();
+            } else {
+                $('#location').find('.b-close').trigger('click');
+            }
+        });
+    })(jQuery);
 </script>
