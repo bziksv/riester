@@ -3,7 +3,7 @@ set -e
 cd "$(dirname "$0")/.."
 SITE_ROOT="$(pwd)"
 PROD_PATH=/var/www/riester_su_usr87/data/www/riester.su
-HOST=almamed
+HOST=root@62.109.16.215
 PROD_USER=riester_su_usr87
 REMOTE=origin
 BRANCH=main
@@ -33,6 +33,7 @@ ssh "$HOST" "cd $PROD_PATH &&
     git checkout -B $BRANCH 2>/dev/null || git checkout -b $BRANCH
     git remote add $REMOTE https://github.com/bziksv/riester.git
   else
+    git config --global --add safe.directory \"$PROD_PATH\" 2>/dev/null || true
     git remote set-url $REMOTE https://github.com/bziksv/riester.git 2>/dev/null || true
   fi
   GIT_TERMINAL_PROMPT=0 git fetch $REMOTE $BRANCH

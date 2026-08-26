@@ -8,7 +8,7 @@ Bitrix-интернет-магазин медицинского оборудов
 |---|---|
 | GitHub | https://github.com/bziksv/riester |
 | **Git root** | `riester.su/` (= корень сайта на prod) |
-| Prod IP | `45.90.35.63` (SSH: `almamed`) |
+| Prod IP | `62.109.16.215` (SSH: `root@62.109.16.215`, хост `s2.prime-ltd.su`) |
 | Prod path | `/var/www/riester_su_usr87/data/www/riester.su` |
 | Домен | https://riester.su |
 | Локально | http://127.0.0.1:8103/ |
