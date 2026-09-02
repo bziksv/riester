@@ -6,53 +6,6 @@
 
 <div class="footer">
     <div class="container">
-        <div class="footer__wrapper footer__row">
-            <div class="footer__col">
-                <div class="footer__subscribe">
-                    <i class="icon-email_big"></i>
-                    <span><? $APPLICATION->IncludeComponent("bitrix:main.include", "", ["AREA_FILE_SHOW" => "file", "PATH" => SITE_DIR."include/subscribe_desc.php"], false ); ?></span>
-                </div>
-				<div>
-					<div class="footer__info">
-						<div class="footer__title"><? $APPLICATION->IncludeComponent("bitrix:main.include", "", ["AREA_FILE_SHOW" => "file", "PATH" => SITE_DIR."include/title.php"], false ); ?></div>
-						<div class="footer__desc"><? $APPLICATION->IncludeComponent("bitrix:main.include", "", ["AREA_FILE_SHOW" => "file", "PATH" => SITE_DIR."include/subtitle.php"], false ); ?></div>
-					</div>
-				</div>
-            </div>
-            <div class="footer__col">
-
-                <?$APPLICATION->IncludeComponent(
-	"bitrix:sender.subscribe", 
-	"sender.subscribe", 
-	array(
-		"AJAX_MODE" => "N",
-		"AJAX_OPTION_ADDITIONAL" => "",
-		"AJAX_OPTION_HISTORY" => "N",
-		"AJAX_OPTION_JUMP" => "N",
-		"AJAX_OPTION_STYLE" => "Y",
-		"CACHE_TIME" => "3600",
-		"CACHE_TYPE" => "A",
-		"CONFIRMATION" => "N",
-		"HIDE_MAILINGS" => "N",
-		"SET_TITLE" => "N",
-		"SHOW_HIDDEN" => "N",
-		"USER_CONSENT" => "N",
-		"USER_CONSENT_ID" => "1",
-		"USER_CONSENT_IS_CHECKED" => "N",
-		"USER_CONSENT_IS_LOADED" => "N",
-		"USE_PERSONALIZATION" => "Y",
-		"COMPONENT_TEMPLATE" => "sender.subscribe",
-		"COMPOSITE_FRAME_MODE" => "A",
-		"COMPOSITE_FRAME_TYPE" => "AUTO"
-	),
-	false
-);?>
-
-            </div>
-        </div>
-    </div>
-    <hr>
-    <div class="container">
         <div class="footer__row">
             <div class="footer__col">
 
