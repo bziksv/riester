@@ -19,7 +19,7 @@
 
                         <? if($arItem['DESCRIPTION']): ?>
                             <br/>
-                            <span class="goods__name__desc"><?=riester_sanitize_html_content($arItem['DESCRIPTION'])?></span>
+                            <div class="goods__name__desc"><?=riester_sanitize_html_content($arItem['DESCRIPTION'])?></div>
                         <? endif; ?>
                     </a>
                     <div class="goods__info">

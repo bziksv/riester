@@ -29,7 +29,7 @@
                     <?=$item['NAME']?>
                     <? if($item['DESCRIPTION']): ?>
                         <br/>
-                        <span class="goods__name__desc"><?=riester_sanitize_html_content($item['DESCRIPTION'])?></span>
+                        <div class="goods__name__desc"><?=riester_sanitize_html_content($item['DESCRIPTION'])?></div>
                     <? endif; ?>
                 </a>
 

@@ -47,6 +47,11 @@ function riester_sanitize_html_content($html, $pageH1 = null)
     $html = preg_replace('/(\d+)\.(px)\b/iu', '$1$2', $html);
     // Bare "px" length token (not part of "10px"): "0px px 1.5em" → "0px 0 1.5em"
     $html = preg_replace('/(?<=[\s:;,])px\b/iu', '0', $html);
+    // Leading decimal without 0 (some CSS parsers: ".2" → "0.2" in rgba/opacity)
+    $html = preg_replace('/\brgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*\.(\d+)\s*\)/iu', 'rgba($1, $2, $3, 0.$4)', $html);
+    // IE-only filters in inline styles → CSS parse noise for Yandex
+    $html = preg_replace('/\s*filter\s*:\s*progid:[^;"]*;?/iu', '', $html);
+    $html = preg_replace('/\s*-ms-filter\s*:\s*[^;"]*;?/iu', '', $html);
 
     // Invalid list type on <ol> (disc/circle/square belong to <ul>)
     $html = preg_replace('/(<ol\b[^>]*)\s+type\s*=\s*(["\'])(?:disc|circle|square)\2/iu', '$1', $html);
@@ -289,9 +294,15 @@ function riester_sanitize_html_content($html, $pageH1 = null)
         }
     }
 
-    // Orphan <li> after heading/figure (no wrapping ul/ol) → wrap in <ul>
+    // Orphan <li> after block / at start (no wrapping ul/ol) → wrap in <ul>
     $html = preg_replace(
-        '#(</(?:h[1-6]|figure)>)(\s*(?:<li\b[\s\S]*?</li>\s*)+)#iu',
+        '#(</(?:h[1-6]|figure|p|div|hr|table)>|^)(\s*(?:<li\b[\s\S]*?</li>\s*)+)#iu',
+        '$1<ul>$2</ul>',
+        $html
+    );
+    // <div><li>…</li></div> → <div><ul><li>…</li></ul></div>
+    $html = preg_replace(
+        '#(<div\b[^>]*>)(\s*(?:<li\b[\s\S]*?</li>\s*)+)#iu',
         '$1<ul>$2</ul>',
         $html
     );
@@ -302,6 +313,9 @@ function riester_sanitize_html_content($html, $pageH1 = null)
         '<li$1>$2</li>',
         $html
     );
+
+    // Drop orphan closing tags (extra </ol></ul></li></p>) via a shallow stack walk
+    $html = riester_sanitize_drop_orphan_closings($html);
 
     // Heading hierarchy under page H1: remap used levels to H2… without skips
     // (e.g. only H3s → H2; H2+H4 → H2+H3).
@@ -354,4 +368,79 @@ function riester_include_html_file($relativePath, $params = array(), $arParams =
     ob_start();
     $APPLICATION->IncludeFile($relativePath, $params, $arParams);
     echo riester_sanitize_html_content(ob_get_clean());
+}
+
+/**
+ * Remove stray closing tags for p/li/ul/ol when the stack is empty.
+ */
+function riester_sanitize_drop_orphan_closings($html)
+{
+    if (!is_string($html) || $html === '') {
+        return $html;
+    }
+
+    $voidish = array('br' => true, 'hr' => true, 'img' => true, 'meta' => true, 'input' => true, 'link' => true);
+    $track = array('p' => true, 'li' => true, 'ul' => true, 'ol' => true);
+    $stack = array();
+    $out = '';
+    $offset = 0;
+    $len = strlen($html);
+
+    while ($offset < $len) {
+        if (!preg_match('/<\/?([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/', $html, $m, PREG_OFFSET_CAPTURE, $offset)) {
+            $out .= substr($html, $offset);
+            break;
+        }
+
+        $tagStart = $m[0][1];
+        $tagHtml = $m[0][0];
+        $tagName = strtolower($m[1][0]);
+        $out .= substr($html, $offset, $tagStart - $offset);
+
+        $isClose = (isset($tagHtml[1]) && $tagHtml[1] === '/');
+        $isSelf = (!$isClose && (substr($tagHtml, -2) === '/>' || isset($voidish[$tagName])));
+
+        if ($isClose && isset($track[$tagName])) {
+            $idx = null;
+            for ($i = count($stack) - 1; $i >= 0; $i--) {
+                if ($stack[$i] === $tagName) {
+                    $idx = $i;
+                    break;
+                }
+            }
+            if ($idx === null) {
+                // orphan closing tag — drop it
+                $offset = $tagStart + strlen($tagHtml);
+                continue;
+            }
+            // pop through nested opens down to this tag
+            $stack = array_slice($stack, 0, $idx);
+            $out .= $tagHtml;
+            $offset = $tagStart + strlen($tagHtml);
+            continue;
+        }
+
+        if (!$isClose && !$isSelf && isset($track[$tagName])) {
+            // auto-close <p> before block / another <p>
+            if ($tagName === 'p' || $tagName === 'ul' || $tagName === 'ol') {
+                while (!empty($stack) && end($stack) === 'p') {
+                    array_pop($stack);
+                    $out .= '</p>';
+                }
+            }
+            // <li> closes previous <li>
+            if ($tagName === 'li') {
+                while (!empty($stack) && end($stack) === 'li') {
+                    array_pop($stack);
+                    $out .= '</li>';
+                }
+            }
+            $stack[] = $tagName;
+        }
+
+        $out .= $tagHtml;
+        $offset = $tagStart + strlen($tagHtml);
+    }
+
+    return $out;
 }
