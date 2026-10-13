@@ -67,6 +67,36 @@ function riester_sanitize_html_content($html, $pageH1 = null)
         $html
     );
 
+    // Headings with orphan </p>/<p> and/or media inside (editor leftovers)
+    // e.g. <h2>Text: </p> <p> <img …></h2> → <h2>Text:</h2><img …>
+    $html = preg_replace_callback(
+        '#<(h[1-6])(\s[^>]*)?>([\s\S]*?)</\1>#iu',
+        function ($m) {
+            $tag = $m[1];
+            $attrs = isset($m[2]) ? $m[2] : '';
+            $inner = $m[3];
+            $moved = '';
+            $inner = preg_replace_callback(
+                '#\s*((?:<figure\b[\s\S]*?</figure>)|(?:<img\b[^>]*/?>))#iu',
+                function ($im) use (&$moved) {
+                    $moved .= $im[1];
+                    return ' ';
+                },
+                $inner
+            );
+            $inner = preg_replace('#</?p\b[^>]*>#iu', '', $inner);
+            $inner = trim(preg_replace('/\s+/u', ' ', $inner));
+            if ($inner === '' && $moved === '') {
+                return $m[0];
+            }
+            if ($inner === '') {
+                return $moved;
+            }
+            return '<' . $tag . $attrs . '>' . $inner . '</' . $tag . '>' . $moved;
+        },
+        $html
+    );
+
     // Unwrap <span> that contains block-level content (p/h2/ul/…)
     $html = preg_replace(
         '#<span\b[^>]*>\s*([\s\S]*?(?:<(?:p|h[1-6]|ul|ol|div|figure|table|hr)\b)[\s\S]*?)</span>#iu',
