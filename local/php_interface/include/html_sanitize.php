@@ -611,6 +611,12 @@ function riester_sanitize_css_yandex_cleanup($css)
     );
     $css = preg_replace('/\benv\s*\(\s*[^)]+\)/i', '0px', $css);
     $css = preg_replace('/\s*(?:row-|column-)?gap\s*:\s*[^;{}]+;?/i', '', $css);
+    // Typo: :not(.x)_wrapper → :not(.x) .goods__item_wrapper (W3C/Yandex CSS Parse Error)
+    $css = preg_replace(
+        '/\.goods__item:not\(\.goods__item_list\)_wrapper\b/i',
+        '.goods__item:not(.goods__item_list) .goods__item_wrapper',
+        $css
+    );
     // Class selectors that START with -- (Bitrix popup .--fixed) → Yandex Parse Error
     // (BEM like .foo--bar is fine; only ".\--name" / ".--name" breaks old parsers)
     $css = preg_replace('/\.--([A-Za-z0-9_-]+)/', '[class~="--$1"]', $css);
@@ -694,7 +700,8 @@ function riester_sanitize_drop_orphan_closings($html)
     }
 
     $voidish = array('br' => true, 'hr' => true, 'img' => true, 'meta' => true, 'input' => true, 'link' => true);
-    $track = array('p' => true, 'li' => true, 'ul' => true, 'ol' => true);
+    // Include phrasing closings (i/b/em) — Yandex "Unexpected end tag : i"
+    $track = array('p' => true, 'li' => true, 'ul' => true, 'ol' => true, 'i' => true, 'b' => true, 'em' => true, 'strong' => true);
     // HTML5: these close an open <p> (so a following </p> is orphan)
     $closesP = array(
         'p' => true, 'div' => true, 'ul' => true, 'ol' => true, 'table' => true,
@@ -726,6 +733,10 @@ function riester_sanitize_drop_orphan_closings($html)
             while (!empty($stack) && end($stack) === 'p') {
                 array_pop($stack);
                 $out .= '</p>';
+            }
+            // HTML5: phrasing tags auto-close before blocks — drop later orphan </i></b>…
+            while (!empty($stack) && isset($track[end($stack)]) && in_array(end($stack), array('i', 'b', 'em', 'strong'), true)) {
+                array_pop($stack);
             }
         }
 

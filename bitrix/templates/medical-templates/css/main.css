@@ -450,6 +450,15 @@ ol,ul
     -webkit-align-items: center;
     -webkit-box-align: center;
 }
+.header__basket_content
+{
+    display: block;
+}
+.header__basket_content .header__basket_price,
+.header__basket_content .header__desc
+{
+    display: block;
+}
 .header__basket_price
 {
     color: #4f4f4f;
@@ -1100,7 +1109,7 @@ ol,ul
 {
     right: -3px;
 }
-.goods__list .goods__item:not(.goods__item_list)_wrapper
+.goods__list .goods__item:not(.goods__item_list) .goods__item_wrapper
 {
     margin: -5px -5px 0;
 }

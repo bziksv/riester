@@ -6,6 +6,13 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/local/php_interface/include/html_sani
 
 // After arturgolubev.cssinliner (DB sort 510): clean IE filters / CSS vars in inlined <style>
 AddEventHandler('main', 'OnEndBufferContent', 'riester_sanitize_page_css', 600);
+// Drop orphan </i></b> etc. in full page HTML (section/product editor leftovers)
+AddEventHandler('main', 'OnEndBufferContent', function (&$content) {
+	if (!is_string($content) || $content === '' || stripos($content, '</i>') === false) {
+		return;
+	}
+	$content = riester_sanitize_drop_orphan_closings($content);
+}, 610);
 
 // Keep Bitrix UI design-tokens out of cssinliner (CSS variables → Yandex Parse Error)
 AddEventHandler('main', 'OnBeforeProlog', function () {
