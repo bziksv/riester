@@ -39,7 +39,6 @@ $APPLICATION->SetTitle("О компании");
 	</div>
 
 	<div class="main text">
-		<div class="title"><?$APPLICATION->ShowTitle()?></div>
 		<div class="content">
 			<?
 			// включаемая область для раздела

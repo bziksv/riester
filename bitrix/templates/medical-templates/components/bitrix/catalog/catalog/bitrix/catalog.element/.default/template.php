@@ -114,11 +114,16 @@ $this->setFrameMode(true);
 		<?if($arResult['DETAIL_TEXT']):?>
 		<a href="#" class="tabs__nav">Описание</a>
 		<div class="tabs__content text">
-			<?= riester_sanitize_html_content($arResult['DETAIL_TEXT']) ?>
+			<?= riester_sanitize_html_content(
+				$arResult['DETAIL_TEXT'],
+				!empty($arResult['IPROPERTY_VALUES']['ELEMENT_PAGE_TITLE'])
+					? $arResult['IPROPERTY_VALUES']['ELEMENT_PAGE_TITLE']
+					: $arResult['NAME']
+			) ?>
 		</div>
 		<?endif?>
 
-		<?if($arResult['PROPERTIES']['CML2_ATTRIBUTES']['DESCRIPTION'][0]):?>
+		<?if($arResult['PROPERTIES']['CML2_ATTRIBUTES']['DESCRIPTION'][0]:?>
 		<a href="#" class="tabs__nav">Характеристики</a>
 		<div class="tabs__content text">
 			<table>
@@ -135,7 +140,12 @@ $this->setFrameMode(true);
 		<?if($arResult['PROPERTIES']['CML2_COMPLECT']['VALUE']['TEXT']):?>
 		<a href="#" class="tabs__nav">Комплектация</a>
 		<div class="tabs__content text">
-			<?= riester_sanitize_html_content($arResult['PROPERTIES']['CML2_COMPLECT']['~VALUE']['TEXT']) ?>
+			<?= riester_sanitize_html_content(
+				$arResult['PROPERTIES']['CML2_COMPLECT']['~VALUE']['TEXT'],
+				!empty($arResult['IPROPERTY_VALUES']['ELEMENT_PAGE_TITLE'])
+					? $arResult['IPROPERTY_VALUES']['ELEMENT_PAGE_TITLE']
+					: $arResult['NAME']
+			) ?>
 		</div>
 		<?endif;?>
 

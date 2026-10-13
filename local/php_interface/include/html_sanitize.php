@@ -317,13 +317,14 @@ function riester_sanitize_html_content($html, $pageH1 = null)
     // Drop orphan closing tags (extra </ol></ul></li></p>) via a shallow stack walk
     $html = riester_sanitize_drop_orphan_closings($html);
 
-    // Heading hierarchy under page H1: remap used levels to H2… without skips
-    // (e.g. only H3s → H2; H2+H4 → H2+H3).
+    // Heading hierarchy: close level skips without inventing a false outline.
+    // If $pageH1 is set, the page already has an H1 → remap content to H2+.
+    // Otherwise keep a content H1 (static pages like /about/ content.php).
     if (preg_match_all('#<h([1-6])\b#iu', $html, $hm)) {
         $used = array_values(array_unique(array_map('intval', $hm[1])));
         sort($used, SORT_NUMERIC);
         $map = array();
-        $next = 2;
+        $next = (is_string($pageH1) && $pageH1 !== '') ? 2 : 1;
         foreach ($used as $lvl) {
             $map[$lvl] = min($next, 6);
             $next++;
