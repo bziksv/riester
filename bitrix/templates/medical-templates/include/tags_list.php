@@ -2,7 +2,10 @@
 if(!$arParams['SECTION']['UF_TAGS_ACTIVE'])
     return false;
 
-\Bitrix\Main\Page\Asset::getInstance()->addCss(SITE_TEMPLATE_PATH . '/css/tags_list.css');
+$asset = \Bitrix\Main\Page\Asset::getInstance();
+$asset->addCss(SITE_TEMPLATE_PATH . '/css/tags_list.css');
+$asset->addCss(SITE_TEMPLATE_PATH . '/css/slick/slick.css');
+$asset->addJs(SITE_TEMPLATE_PATH . '/js/slick.min.js');
 ?>
 
 <div class="tags-list">
@@ -35,9 +38,6 @@ if(!$arParams['SECTION']['UF_TAGS_ACTIVE'])
 
 </div>
 
-
-<link rel="stylesheet" type="text/css" href="<?= SITE_TEMPLATE_PATH ?>/css/slick/slick.css"/>
-<script type="text/javascript" src="<?= SITE_TEMPLATE_PATH ?>/js/slick.min.js"></script>
 <script>
 
     $('.tag-slider').slick({

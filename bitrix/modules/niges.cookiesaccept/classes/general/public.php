@@ -8,6 +8,12 @@ class CNigesCookiesAcceptPublic
 	{
 		global $APPLICATION;
 
+		// Banner is printed in the site footer before </body>. Epilog runs after
+		// </html>, which produced a sitewide “Stray start tag div” for validators.
+		if (defined('RIESTER_COOKIES_BANNER_RENDERED') && RIESTER_COOKIES_BANNER_RENDERED) {
+			return;
+		}
+
 		if (!CModule::IncludeModule(cookiesaccept_MODULE_ID)) {
 			return;
 		}

@@ -123,6 +123,18 @@ $APPLICATION->IncludeComponent(
 })(window, document, 'script', 'cloud.roistat.com', 'f504a26807eaae0c8a718305b990b815');
 </script>
 
+<?php
+if (!defined('RIESTER_COOKIES_BANNER_RENDERED')) {
+	define('RIESTER_COOKIES_BANNER_RENDERED', true);
+	$APPLICATION->IncludeComponent(
+		'niges:cookiesaccept',
+		'.default',
+		array(),
+		false,
+		array('HIDE_ICONS' => 'Y')
+	);
+}
+?>
 
 </body>
 </html>

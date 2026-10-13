@@ -59,8 +59,8 @@ class Frontend
 			'noticeCheckout' => EmailPolicy::getNoticeHtml('checkout'),
 		];
 
-		$cssHref = '/local/modules/prime.alerts/assets/style.css?v=1.2.2';
-		$jsHref = '/local/modules/prime.alerts/assets/policy.js?v=1.2.2';
+		$cssHref = '/local/modules/prime.alerts/assets/style.css?v=1.2.3';
+		$jsHref = '/local/modules/prime.alerts/assets/policy.js?v=1.2.3';
 		$flash = '';
 		try {
 			$session = \Bitrix\Main\Application::getInstance()->getSession();
@@ -77,7 +77,14 @@ class Frontend
 			$flash = '';
 		}
 
-		$inject = "\n<link rel=\"stylesheet\" href=\"" . htmlspecialcharsbx($cssHref) . "\">\n"
+		// CSS must go into <head> — cssinliner turns <link> into <style>, which is
+		// invalid as a direct child of <body> for Yandex/W3C HTML checks.
+		$cssTag = '<link rel="stylesheet" href="' . htmlspecialcharsbx($cssHref) . '">' . "\n";
+		if (stripos($content, '</head>') !== false) {
+			$content = preg_replace('/<\/head>/i', $cssTag . '</head>', $content, 1);
+		}
+
+		$inject = "\n"
 			. '<script>window.PRIME_ALERTS=' . Json::encode($config) . ';</script>' . "\n"
 			. '<script src="' . htmlspecialcharsbx($jsHref) . '"></script>' . "\n";
 

@@ -31,7 +31,7 @@ $APPLICATION->SetTitle("Оплата");
 		<div class="content">
 			 <?
                 // включаемая область для раздела
-                $APPLICATION->IncludeFile($APPLICATION->GetCurDir()."content.php", Array(), Array(
+                riester_include_html_file($APPLICATION->GetCurDir()."content.php", Array(), Array(
                     "MODE"      => "html",                                           // будет редактировать в веб-редакторе
                     "NAME"      => "Редактирование включаемой области раздела",      // текст всплывающей подсказки на иконке
                     "TEMPLATE"  => ""                    // имя шаблона для нового файла

@@ -8,7 +8,8 @@ if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) {
 /** @var CMain $APPLICATION */
 
 if (method_exists($this, 'setFrameMode')) {
-	$this->setFrameMode(true);
+	// Keep banner inside </body>; composite frames were appending it after </html>.
+	$this->setFrameMode(false);
 }
 
 $this->addExternalCss('/bitrix/components/niges/cookiesaccept/templates/.default/style.css');

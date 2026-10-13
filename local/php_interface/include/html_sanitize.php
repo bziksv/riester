@@ -42,9 +42,17 @@ function riester_sanitize_html_content($html, $pageH1 = null)
     // Cyrillic "с" mistaken for Latin "c" in hex colors (#ссс → #ccc)
     $html = str_replace(array('#ссс', '#ССС'), '#ccc', $html);
 
-    // Broken editor CSS: "margin: px 0px …" / "1.px" (typo before unit)
+    // Broken editor CSS: "margin: px …", "margin: 0px px 1.5em", "1.px"
     $html = preg_replace('/\bmargin\s*:\s*px\b/iu', 'margin: 0', $html);
     $html = preg_replace('/(\d+)\.(px)\b/iu', '$1$2', $html);
+    // Bare "px" length token (not part of "10px"): "0px px 1.5em" → "0px 0 1.5em"
+    $html = preg_replace('/(?<=[\s:;,])px\b/iu', '0', $html);
+
+    // Invalid list type on <ol> (disc/circle/square belong to <ul>)
+    $html = preg_replace('/(<ol\b[^>]*)\s+type\s*=\s*(["\'])(?:disc|circle|square)\2/iu', '$1', $html);
+
+    // Drop editor <style> blocks inside content (invalid under div/body fragments)
+    $html = preg_replace('#<style\b[^>]*>[\s\S]*?</style>#iu', '', $html);
 
     $html = str_replace(
         array('<noindex>', '</noindex>'),
@@ -142,6 +150,9 @@ function riester_sanitize_html_content($html, $pageH1 = null)
                         $attrs .= ' ' . $name;
                     }
                 }
+            }
+            if (!preg_match('/\balt\s*=/i', $attrs)) {
+                $attrs .= ' alt=""';
             }
             return '<img' . $attrs . '>';
         },
@@ -296,4 +307,21 @@ function riester_sanitize_html_content($html, $pageH1 = null)
     }
 
     return $html;
+}
+
+/**
+ * Include a Bitrix area file and sanitize its HTML for validator noise.
+ */
+function riester_include_html_file($relativePath, $params = array(), $arParams = array())
+{
+    global $APPLICATION;
+    if (!is_array($params)) {
+        $params = array();
+    }
+    if (!is_array($arParams)) {
+        $arParams = array();
+    }
+    ob_start();
+    $APPLICATION->IncludeFile($relativePath, $params, $arParams);
+    echo riester_sanitize_html_content(ob_get_clean());
 }
