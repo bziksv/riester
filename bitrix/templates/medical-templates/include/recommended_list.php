@@ -1,15 +1,10 @@
 <?php
 if(!$arParams['SECTION']['UF_RECOMMENDED_LIST'])
     return false;
+
+\Bitrix\Main\Page\Asset::getInstance()->addCss(SITE_TEMPLATE_PATH . '/css/recommended_list.css');
 ?>
 <hr class="hr">
-
-<style>
-    .goods__name__desc{
-        font-weight: 400;
-        font-size: smaller;
-    }
-</style>
 
 <? foreach ($arParams['SECTION']['UF_RECOMMENDED_LIST'] as $p):
     $arSlider = explode('@', $p, 3);

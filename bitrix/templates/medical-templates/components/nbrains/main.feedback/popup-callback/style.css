@@ -15,7 +15,7 @@
     line-height: 18px;
     font-size: 21px;
     cursor: pointer;
-    border: 1px solid #8080803b;
+    border: 1px solid rgba(128,128,128,0.23);
 }
 
 .mfeedback-p .mfeedback-p-head{

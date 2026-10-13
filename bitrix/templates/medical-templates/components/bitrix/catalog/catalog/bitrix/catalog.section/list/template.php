@@ -29,7 +29,7 @@ if(empty($arResult['ITEMS']))
 				<div class="goods__content">
 					<a href="<?=$item['DETAIL_PAGE_URL'];?>" class="goods__name"><?=$item['IPROPERTY_VALUES']['ELEMENT_PAGE_TITLE']?></a>
 					<div class="goods__text">
-						<?=$item['PREVIEW_TEXT']?>
+						<?= riester_sanitize_html_content($item['PREVIEW_TEXT']) ?>
 					</div>
 					<!--<div class="goods__availability false">Нет в наличии</div>-->
 				</div>

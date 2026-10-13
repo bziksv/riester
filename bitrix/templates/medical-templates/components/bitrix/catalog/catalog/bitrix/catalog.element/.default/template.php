@@ -114,7 +114,7 @@ $this->setFrameMode(true);
 		<?if($arResult['DETAIL_TEXT']):?>
 		<a href="#" class="tabs__nav">Описание</a>
 		<div class="tabs__content text">
-			<?=$arResult['DETAIL_TEXT']?>
+			<?= riester_sanitize_html_content($arResult['DETAIL_TEXT']) ?>
 		</div>
 		<?endif?>
 
@@ -135,7 +135,7 @@ $this->setFrameMode(true);
 		<?if($arResult['PROPERTIES']['CML2_COMPLECT']['VALUE']['TEXT']):?>
 		<a href="#" class="tabs__nav">Комплектация</a>
 		<div class="tabs__content text">
-			<?=$arResult['PROPERTIES']['CML2_COMPLECT']['~VALUE']['TEXT']?>
+			<?= riester_sanitize_html_content($arResult['PROPERTIES']['CML2_COMPLECT']['~VALUE']['TEXT']) ?>
 		</div>
 		<?endif;?>
 

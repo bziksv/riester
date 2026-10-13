@@ -31,8 +31,8 @@
 	border-radius: 2px;
 	outline: none;
 	box-shadow: none !important;
-	-webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-	transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+	-webkit-transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+	transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 .bx-ios .bx-subscribe .bx-input-group .bx-form-control {
 	/* Fix of input shadow for IOS browsers. */

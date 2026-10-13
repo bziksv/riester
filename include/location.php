@@ -29,44 +29,6 @@
     <? endif; ?>
 </div>
 
-<style>
-    #location {
-        display: none;
-        width: 92%;
-        max-width: 520px;
-        max-height: 80vh;
-        overflow-y: auto;
-        text-align: left;
-    }
-
-    .city .item-city {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        margin: 10px auto;
-        padding: 0 10px;
-    }
-    .city .item-city a {
-        width: 140px;
-        margin-bottom: 5px;
-        color: #575b71;
-        text-decoration: none;
-    }
-    .city .item-city a:hover {
-        color: #c82c30;
-    }
-    .city .item-city a.city-show {
-        flex-grow: 1;
-        text-align: center;
-    }
-    .city .item-city:last-child{
-        display: none;
-    }
-    .city .item-city:last-child.active{
-        display: flex;
-    }
-</style>
-
 <script>
     (function($) {
         var locationPopupApi = null;

@@ -11,7 +11,7 @@
  <b>Условия оплаты и доставки без дополнительного договора</b>
 </p>
 <p>
-	 Можно заплатить за товар, не оформляя индивидуального соглашения с особыми требованиями. В таком случае клиент соглашается на стандартные условия обслуживания. Договор оферты:&nbsp;<noindex><a href="https://riester.su/upload/oferta-riester.pdf" rel="nofollow" target="_blank">https://riester.su/upload/oferta-riester.pdf</a></noindex><br>
+	 Можно заплатить за товар, не оформляя индивидуального соглашения с особыми требованиями. В таком случае клиент соглашается на стандартные условия обслуживания. Договор оферты:&nbsp;<!--noindex--><a href="https://riester.su/upload/oferta-riester.pdf" rel="nofollow" target="_blank">https://riester.su/upload/oferta-riester.pdf</a><!--/noindex--><br>
  <br>
 	 Мы рассчитываем на длительное сотрудничество!<br>
  <br>

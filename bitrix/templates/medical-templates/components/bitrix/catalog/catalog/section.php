@@ -77,7 +77,7 @@ $intSectionID = 0;
 
 	<? if($arSection['ELEMENT_CNT'] OR $arSection['UF_SUBSECTIONS']): ?>
 
-	<form class="filter" method="get" action="">
+	<form class="filter" method="get" action="<?= htmlspecialcharsbx($APPLICATION->GetCurPage(false)) ?>">
 		<label class="filter__label filter__sort">
 			Сортировать по:
 			<select name="ELEMENT_SORT_FIELD" class="iselect" onchange="this.form.submit()">
@@ -246,7 +246,7 @@ unset($basketAction);
 	<div class="catalog-text">
 	<?
 	if($arSection['DESCRIPTION'] && $arSection['UF_DESC_SECTION']){
-		print $arSection['DESCRIPTION'];
+		print riester_sanitize_html_content($arSection['DESCRIPTION'], $arSection['NAME']);
 	}
 	?>
 	</div>

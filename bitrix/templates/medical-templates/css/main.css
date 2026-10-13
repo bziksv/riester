@@ -87,7 +87,7 @@ ol,ul
     line-height: 18px;
     font-size: 21px;
     cursor: pointer;
-    border: 1px solid #8080803b;
+    border: 1px solid rgba(128,128,128,0.23);
 }
 .more_options .goods__list-2 .goods__text .red{
     color: #c82c30;
