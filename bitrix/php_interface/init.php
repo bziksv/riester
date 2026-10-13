@@ -4,6 +4,9 @@ define("IBLOCK_CATALOG","33");
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/local/php_interface/include/html_sanitize.php';
 
+// After arturgolubev.cssinliner (DB sort 510): clean IE filters in inlined <style>
+AddEventHandler('main', 'OnEndBufferContent', 'riester_sanitize_page_css', 600);
+
 if (
 	(!empty($_REQUEST['success']) && is_string($_REQUEST['success']))
 	|| (!empty($_POST['submit']) && $_SERVER['REQUEST_METHOD'] === 'POST')

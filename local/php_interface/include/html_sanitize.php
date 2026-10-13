@@ -294,18 +294,8 @@ function riester_sanitize_html_content($html, $pageH1 = null)
         }
     }
 
-    // Orphan <li> after block / at start (no wrapping ul/ol) → wrap in <ul>
-    $html = preg_replace(
-        '#(</(?:h[1-6]|figure|p|div|hr|table)>|^)(\s*(?:<li\b[\s\S]*?</li>\s*)+)#iu',
-        '$1<ul>$2</ul>',
-        $html
-    );
-    // <div><li>…</li></div> → <div><ul><li>…</li></ul></div>
-    $html = preg_replace(
-        '#(<div\b[^>]*>)(\s*(?:<li\b[\s\S]*?</li>\s*)+)#iu',
-        '$1<ul>$2</ul>',
-        $html
-    );
+    // Orphan <li> outside ul/ol (incl. after </ul>, with nested lists) → wrap in <ul>
+    $html = riester_sanitize_wrap_orphan_lis($html);
 
     // <li><p>text</p></li> → <li>text</li> (avoids “p child of ul” noise)
     $html = preg_replace(
@@ -369,6 +359,130 @@ function riester_include_html_file($relativePath, $params = array(), $arParams =
     ob_start();
     $APPLICATION->IncludeFile($relativePath, $params, $arParams);
     echo riester_sanitize_html_content(ob_get_clean());
+}
+
+/**
+ * Wrap <li> sequences that appear outside any ul/ol (editor leftovers after </ul>).
+ * Nested lists inside those li are preserved.
+ */
+function riester_sanitize_wrap_orphan_lis($html)
+{
+    if (!is_string($html) || $html === '' || stripos($html, '<li') === false) {
+        return $html;
+    }
+
+    $voidish = array(
+        'br' => true, 'hr' => true, 'img' => true, 'meta' => true,
+        'input' => true, 'link' => true, 'source' => true, 'wbr' => true,
+    );
+    $out = '';
+    $offset = 0;
+    $len = strlen($html);
+    $listDepth = 0;
+    $orphan = '';
+    $orphanDepth = 0;
+
+    $flushOrphan = function () use (&$out, &$orphan, &$orphanDepth) {
+        if ($orphan === '') {
+            return;
+        }
+        $out .= '<ul>' . $orphan . '</ul>';
+        $orphan = '';
+        $orphanDepth = 0;
+    };
+
+    while ($offset < $len) {
+        if (!preg_match('/<\/?([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/', $html, $m, PREG_OFFSET_CAPTURE, $offset)) {
+            $chunk = substr($html, $offset);
+            if ($orphan !== '') {
+                $orphan .= $chunk;
+                $flushOrphan();
+            } else {
+                $out .= $chunk;
+            }
+            break;
+        }
+
+        $tagStart = $m[0][1];
+        $tagHtml = $m[0][0];
+        $tagName = strtolower($m[1][0]);
+        $text = substr($html, $offset, $tagStart - $offset);
+        $isClose = (isset($tagHtml[1]) && $tagHtml[1] === '/');
+        $isSelf = (!$isClose && (substr($tagHtml, -2) === '/>' || isset($voidish[$tagName])));
+
+        if ($orphan !== '') {
+            $orphan .= $text;
+            if (!$isSelf && ($tagName === 'li' || $tagName === 'ul' || $tagName === 'ol')) {
+                if ($isClose) {
+                    $orphanDepth--;
+                } else {
+                    $orphanDepth++;
+                }
+            }
+            $orphan .= $tagHtml;
+            $offset = $tagStart + strlen($tagHtml);
+            if ($orphanDepth <= 0) {
+                $orphanDepth = 0;
+                if (!preg_match('/\G(?:\s|<br\s*\/?>)*<li\b/i', $html, $pm, 0, $offset)) {
+                    $flushOrphan();
+                }
+            }
+            continue;
+        }
+
+        $out .= $text;
+
+        if (!$isClose && !$isSelf && $tagName === 'li' && $listDepth === 0) {
+            $orphan = $tagHtml;
+            $orphanDepth = 1;
+            $offset = $tagStart + strlen($tagHtml);
+            continue;
+        }
+
+        if (!$isSelf && ($tagName === 'ul' || $tagName === 'ol')) {
+            if ($isClose) {
+                if ($listDepth > 0) {
+                    $listDepth--;
+                }
+            } else {
+                $listDepth++;
+            }
+        }
+
+        $out .= $tagHtml;
+        $offset = $tagStart + strlen($tagHtml);
+    }
+
+    $flushOrphan();
+    return $out;
+}
+
+/**
+ * Strip IE-only / validator-hostile CSS from inlined <style> blocks (cssinliner).
+ */
+function riester_sanitize_page_css(&$content)
+{
+    if (!is_string($content) || $content === '') {
+        return;
+    }
+    // After cssinliner (sort 510): strip IE filters / unset from inlined <style>
+    if (stripos($content, '<style') === false) {
+        return;
+    }
+    $replaced = preg_replace_callback(
+        '#(<style\b[^>]*>)([\s\S]*?)(</style>)#i',
+        function ($m) {
+            $css = $m[2];
+            $css = preg_replace('/\s*filter\s*:\s*progid:[^;{}]+;?/i', '', $css);
+            $css = preg_replace('/\s*-ms-filter\s*:\s*[^;{}]+;?/i', '', $css);
+            $css = preg_replace('/\blist-style\s*:\s*unset\b/i', 'list-style: none', $css);
+            return $m[1] . $css . $m[3];
+        },
+        $content
+    );
+    if (is_string($replaced)) {
+        $content = $replaced;
+    }
 }
 
 /**

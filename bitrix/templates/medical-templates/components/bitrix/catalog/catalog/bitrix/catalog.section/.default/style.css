@@ -382,7 +382,6 @@
 	background:      linear-gradient(to bottom,#00a2df 0%,#006fcb 100%);
 	color:#fff;
 	text-shadow:0 1px 0 #006cae;
-	filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#00a2df',endColorstr='#006fcb',GradientType=0 );
 }
 .bx_catalog_list_home .bx_bt_button:hover  		{
 	background:#21afe4;
@@ -393,7 +392,6 @@
 	background:   -ms-linear-gradient(top,#21afe4 0%,#006fcb 100%);
 	background:    -o-linear-gradient(top,#21afe4 0%,#006fcb 100%);
 	background:       linear-gradient(to bottom,#21afe4 0%,#006fcb 100%);
-	filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#21afe4',endColorstr='#006fcb',GradientType=0 );
 }
 .bx_catalog_list_home .bx_bt_button:active  		{
 	background:#21afe4;
@@ -404,7 +402,6 @@
 	background:   -ms-linear-gradient(top,#21afe4 0%,#006fcb 100%);
 	background:    -o-linear-gradient(top,#21afe4 0%,#006fcb 100%);
 	background:       linear-gradient(to bottom,#21afe4 0%,#006fcb 100%);
-	filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#21afe4',endColorstr='#006fcb',GradientType=0 );
 }
 
 
