@@ -72,6 +72,13 @@ function riester_sanitize_html_content($html, $pageH1 = null)
         $html
     );
 
+    // <p><h2>…</h2></p> → <h2>…</h2> (heading closes <p> in HTML5 → stray </p>)
+    $html = preg_replace(
+        '#<p\b[^>]*>\s*(<(h[1-6])(\s[^>]*)?>[\s\S]*?</\2>)\s*</p>#iu',
+        '$1',
+        $html
+    );
+
     // Headings with orphan </p>/<p> and/or media inside (editor leftovers)
     // e.g. <h2>Text: </p> <p> <img …></h2> → <h2>Text:</h2><img …>
     $html = preg_replace_callback(
@@ -475,6 +482,8 @@ function riester_sanitize_page_css(&$content)
             $css = $m[2];
             $css = preg_replace('/\s*filter\s*:\s*progid:[^;{}]+;?/i', '', $css);
             $css = preg_replace('/\s*-ms-filter\s*:\s*[^;{}]+;?/i', '', $css);
+            // IE8 opacity: filter:alpha(opacity=N) / Alpha(Opacity=N)
+            $css = preg_replace('/\s*filter\s*:\s*alpha\s*\([^)]*\)\s*;?/i', '', $css);
             $css = preg_replace('/\blist-style\s*:\s*unset\b/i', 'list-style: none', $css);
             return $m[1] . $css . $m[3];
         },
