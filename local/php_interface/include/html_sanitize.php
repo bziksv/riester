@@ -465,6 +465,119 @@ function riester_sanitize_wrap_orphan_lis($html)
 }
 
 /**
+ * Expand var(--x) using --x declarations, then drop custom props.
+ * Old Yandex CSS parser reports "Parse Error" on --foo and var().
+ */
+function riester_sanitize_css_expand_vars($css)
+{
+    if (!is_string($css) || strpos($css, '--') === false) {
+        return $css;
+    }
+
+    // Only real declarations after { or ; (not BEM like .select--single:focus)
+    $vars = array();
+    if (preg_match_all('/(?:^|[{;])\s*(--[A-Za-z0-9_-]+)\s*:\s*([^;{}]+)\s*(?=[;}])/u', $css, $m, PREG_SET_ORDER)) {
+        foreach ($m as $item) {
+            $vars[$item[1]] = trim($item[2]);
+        }
+    }
+
+    $resolveVarCall = function ($args) use (&$vars) {
+        $args = trim($args);
+        $name = '';
+        $fallback = null;
+        if (preg_match('/^(--[A-Za-z0-9_-]+)\s*(?:,\s*(.*))?$/us', $args, $am)) {
+            $name = $am[1];
+            if (isset($am[2]) && $am[2] !== '') {
+                $fallback = trim($am[2]);
+            }
+        } else {
+            return null;
+        }
+        if (isset($vars[$name]) && $vars[$name] !== '') {
+            return $vars[$name];
+        }
+        if ($fallback !== null && $fallback !== '') {
+            return $fallback;
+        }
+        return 'initial';
+    };
+
+    // Replace innermost var(...) first (handles nested var and rgba() fallbacks)
+    $replaceInnermostVars = function ($text) use ($resolveVarCall) {
+        for ($pass = 0; $pass < 2000; $pass++) {
+            $len = strlen($text);
+            $bestPos = null;
+            $bestEnd = null;
+            $bestInner = null;
+            $i = 0;
+            while ($i < $len) {
+                $pos = stripos($text, 'var(', $i);
+                if ($pos === false) {
+                    break;
+                }
+                $depth = 0;
+                $j = $pos + 4;
+                $startArgs = $j;
+                for (; $j < $len; $j++) {
+                    $ch = $text[$j];
+                    if ($ch === '(') {
+                        $depth++;
+                    } elseif ($ch === ')') {
+                        if ($depth === 0) {
+                            break;
+                        }
+                        $depth--;
+                    }
+                }
+                if ($j >= $len) {
+                    break;
+                }
+                $inner = substr($text, $startArgs, $j - $startArgs);
+                if (stripos($inner, 'var(') === false) {
+                    $bestPos = $pos;
+                    $bestEnd = $j;
+                    $bestInner = $inner;
+                    break; // first innermost is enough; loop passes do the rest
+                }
+                $i = $pos + 4;
+            }
+            if ($bestPos === null) {
+                break;
+            }
+            $resolved = $resolveVarCall($bestInner);
+            if ($resolved === null) {
+                $resolved = 'initial';
+            }
+            $text = substr($text, 0, $bestPos) . $resolved . substr($text, $bestEnd + 1);
+        }
+        return $text;
+    };
+
+    for ($pass = 0; $pass < 8; $pass++) {
+        $changed = false;
+        foreach ($vars as $k => $v) {
+            $nv = $replaceInnermostVars($v);
+            if ($nv !== $v) {
+                $vars[$k] = $nv;
+                $changed = true;
+            }
+        }
+        if (!$changed) {
+            break;
+        }
+    }
+
+    $css = $replaceInnermostVars($css);
+    // Drop --name: value; (BEM like .x--mod:focus has no ';' after the pseudo)
+    $css = preg_replace('/--[A-Za-z0-9_-]+\s*:\s*[^;{}]+;/u', '', $css);
+    $css = preg_replace('/--[A-Za-z0-9_-]+\s*:\s*[^;{}]+(?=\s*})/u', '', $css);
+    $css = preg_replace('/:root\s*\{\s*\}/u', '', $css);
+    $css = preg_replace('/;\s*;+/u', ';', $css);
+    return $css;
+}
+
+/**
  * Strip IE-only / validator-hostile CSS from inlined <style> blocks (cssinliner).
  */
 function riester_sanitize_page_css(&$content)
@@ -472,7 +585,7 @@ function riester_sanitize_page_css(&$content)
     if (!is_string($content) || $content === '') {
         return;
     }
-    // After cssinliner (sort 510): strip IE filters / unset from inlined <style>
+    // After cssinliner (sort 510): strip IE filters / unset / expand CSS variables
     if (stripos($content, '<style') === false) {
         return;
     }
@@ -485,6 +598,13 @@ function riester_sanitize_page_css(&$content)
             // IE8 opacity: filter:alpha(opacity=N) / Alpha(Opacity=N)
             $css = preg_replace('/\s*filter\s*:\s*alpha\s*\([^)]*\)\s*;?/i', '', $css);
             $css = preg_replace('/\blist-style\s*:\s*unset\b/i', 'list-style: none', $css);
+            // IE clip:rect(0 0 0 0) → commas (W3C/Yandex parse noise)
+            $css = preg_replace(
+                '/\bclip\s*:\s*rect\(\s*([^\s,)]+)\s+([^\s,)]+)\s+([^\s,)]+)\s+([^\s,)]+)\s*\)/i',
+                'clip: rect($1, $2, $3, $4)',
+                $css
+            );
+            $css = riester_sanitize_css_expand_vars($css);
             return $m[1] . $css . $m[3];
         },
         $content
@@ -492,6 +612,23 @@ function riester_sanitize_page_css(&$content)
     if (is_string($replaced)) {
         $content = $replaced;
     }
+    // Inline style="--foo: bar; ..." (cookie banner etc.)
+    $content = preg_replace_callback(
+        '/\bstyle="([^"]*)"/i',
+        function ($m) {
+            $css = $m[1];
+            if (strpos($css, '--') === false && stripos($css, 'var(') === false) {
+                return $m[0];
+            }
+            $css = riester_sanitize_css_expand_vars($css);
+            $css = trim($css, "; \t\n\r");
+            if ($css === '') {
+                return '';
+            }
+            return 'style="' . $css . '"';
+        },
+        $content
+    );
 }
 
 /**

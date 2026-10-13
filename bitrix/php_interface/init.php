@@ -4,8 +4,25 @@ define("IBLOCK_CATALOG","33");
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/local/php_interface/include/html_sanitize.php';
 
-// After arturgolubev.cssinliner (DB sort 510): clean IE filters in inlined <style>
+// After arturgolubev.cssinliner (DB sort 510): clean IE filters / CSS vars in inlined <style>
 AddEventHandler('main', 'OnEndBufferContent', 'riester_sanitize_page_css', 600);
+
+// Keep Bitrix UI design-tokens out of cssinliner (CSS variables → Yandex Parse Error)
+AddEventHandler('main', 'OnBeforeProlog', function () {
+	static $done = false;
+	if ($done || !function_exists('COption')) {
+		return;
+	}
+	$done = true;
+	$cur = (string)COption::GetOptionString('arturgolubev.cssinliner', 'exceptions', '');
+	if (strpos($cur, '/bitrix/js/ui/') === false) {
+		COption::SetOptionString(
+			'arturgolubev.cssinliner',
+			'exceptions',
+			trim($cur . "\n/bitrix/js/ui/\n/bitrix/css/ui/")
+		);
+	}
+});
 
 if (
 	(!empty($_REQUEST['success']) && is_string($_REQUEST['success']))
