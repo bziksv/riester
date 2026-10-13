@@ -10,13 +10,13 @@
 }
 .prime-alerts-notice__inner {
 	display: flex;
-	gap: 12px;
 	padding: 14px 16px;
 }
 .prime-alerts-notice__icon {
 	flex: 0 0 22px;
 	width: 22px;
 	height: 22px;
+	margin-right: 12px;
 	border-radius: 50%;
 	background: #b8860b;
 	color: #fff;

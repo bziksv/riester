@@ -597,6 +597,20 @@ function riester_sanitize_css_yandex_cleanup($css)
     // scrollbar-color needs 2 colors; after expansion often 1 rgba → drop (popup-only)
     $css = preg_replace('/\s*scrollbar-color\s*:\s*[^;{}]+;?/i', '', $css);
     $css = preg_replace('/\s*scrollbar-width\s*:\s*[^;{}]+;?/i', '', $css);
+    // Vendor scrollbar pseudos + modern filter()/env()/gap → Yandex "CSS: Parse Error"
+    $css = preg_replace('/[^{}]*::-webkit-scrollbar[a-z-]*[^{]*\{[^{}]*\}/i', '', $css);
+    $css = preg_replace(
+        '/\s*filter\s*:\s*(?:brightness|blur|contrast|grayscale|invert|opacity|saturate|sepia|drop-shadow|hue-rotate)\s*\([^)]*\)\s*!important\s*;?/i',
+        '',
+        $css
+    );
+    $css = preg_replace(
+        '/\s*filter\s*:\s*(?:brightness|blur|contrast|grayscale|invert|opacity|saturate|sepia|drop-shadow|hue-rotate)\s*\([^)]*\)\s*;?/i',
+        '',
+        $css
+    );
+    $css = preg_replace('/\benv\s*\(\s*[^)]+\)/i', '0px', $css);
+    $css = preg_replace('/\s*(?:row-|column-)?gap\s*:\s*[^;{}]+;?/i', '', $css);
     // Empty / broken declarations left by empty var() replacement
     $css = preg_replace('/\b[a-z-]+\s*:\s*;/i', '', $css);
     $css = preg_replace('/\b[a-z-]+\s*:\s*!\s*important;?/i', '', $css);

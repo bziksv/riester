@@ -33,8 +33,10 @@ top: auto !important;
 display: flex;
 align-items: center;
 justify-content: space-between;
-gap: 16px;
 flex-wrap: wrap;
+}
+.nca-cookiesaccept-line > .nca-bar > * + * {
+margin-left: 16px;
 }
 .nca-cookiesaccept-line-text {
 flex: 1 1 240px;
@@ -61,7 +63,7 @@ color: #111;
 }
 .nca-accept-btn:hover,
 .nca-accept-btn:focus {
-filter: brightness(0.97);
+opacity: 0.92;
 }
 .nca-cookiesaccept-line.style-1 .nca-cookiesaccept-line-text,
 .nca-cookiesaccept-line.style-3 .nca-cookiesaccept-line-text,
@@ -154,7 +156,7 @@ box-shadow: 0 1px 4px rgba(37, 99, 235, 0.25) !important;
 @media screen and (max-width: 767px) {
     .nca-cookiesaccept-line {
         padding: 10px 12px !important;
-        bottom: calc(16px + env(safe-area-inset-bottom, 16px)) !important;
+        bottom: 32px !important;
         max-height: none !important;
         overflow-y: visible !important;
     }
@@ -162,8 +164,12 @@ box-shadow: 0 1px 4px rgba(37, 99, 235, 0.25) !important;
     .nca-cookiesaccept-line > .nca-bar {
         flex-direction: column !important;
         align-items: center !important;
-        gap: 8px !important;
         text-align: center !important;
+    }
+
+    .nca-cookiesaccept-line > .nca-bar > * + * {
+        margin-left: 0 !important;
+        margin-top: 8px !important;
     }
     
     /* Сбрасываем flex, чтобы 240px не становилось высотой */
