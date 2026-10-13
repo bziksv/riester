@@ -53,7 +53,7 @@
 	-webkit-border-image: url(images/x2border_active.png) 2 stretch;
 	-moz-border-image: url(images/x2border_active.png) 2 stretch;
 	-o-border-image: url(images/x2border_active.png) 2 stretch;
-	border-image: url(images/x2border_active.png) 2 fill stretch;
+	border-image: url(images/x2border_active.png) 2 stretch;
 }
 
 /* scu_detail_scu */
@@ -66,5 +66,5 @@
 	-webkit-border-image: url(images/x2border_active.png) 2 stretch;
 	-moz-border-image: url(images/x2border_active.png) 2 stretch;
 	-o-border-image: url(images/x2border_active.png) 2 stretch;
-	border-image: url(images/x2border_active.png) 2 fill stretch;
+	border-image: url(images/x2border_active.png) 2 stretch;
 }

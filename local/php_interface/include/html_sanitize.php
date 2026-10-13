@@ -611,6 +611,14 @@ function riester_sanitize_css_yandex_cleanup($css)
     );
     $css = preg_replace('/\benv\s*\(\s*[^)]+\)/i', '0px', $css);
     $css = preg_replace('/\s*(?:row-|column-)?gap\s*:\s*[^;{}]+;?/i', '', $css);
+    // Class selectors that START with -- (Bitrix popup .--fixed) → Yandex Parse Error
+    // (BEM like .foo--bar is fine; only ".\--name" / ".--name" breaks old parsers)
+    $css = preg_replace('/\.--([A-Za-z0-9_-]+)/', '[class~="--$1"]', $css);
+    // border-image … fill … (catalog section) — "fill" keyword → Parse Error
+    $css = preg_replace('/(\bborder-image\s*:\s*[^;{}]*?)\s+fill\b/i', '$1', $css);
+    $css = preg_replace('/\s*will-change\s*:\s*[^;{}]+;?/i', '', $css);
+    // [style*="block"] attribute selectors from Bitrix popup
+    $css = preg_replace('/[^{},\n]*\[style\*=["\'][^"\']*["\']\][^{]*\{[^{}]*\}/i', '', $css);
     // Empty / broken declarations left by empty var() replacement
     $css = preg_replace('/\b[a-z-]+\s*:\s*;/i', '', $css);
     $css = preg_replace('/\b[a-z-]+\s*:\s*!\s*important;?/i', '', $css);

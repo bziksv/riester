@@ -525,7 +525,7 @@
 	-webkit-border-image: url(images/x2border.png) 2 stretch;
 	-moz-border-image: url(images/x2border.png) 2 stretch;
 	-o-border-image: url(images/x2border.png) 2 stretch;
-	border-image: url(images/x2border.png) 2 fill stretch;
+	border-image: url(images/x2border.png) 2 stretch;
 }
 .bx_catalog_top_home .bx_item_detail_size ul li:hover .cnt{border: 1px solid #006cc0}
 .bx_catalog_top_home .bx_item_detail_size ul li:active .cnt,
@@ -539,7 +539,7 @@
 	-webkit-border-image: url(images/x2border_active.png) 2 stretch;
 	-moz-border-image: url(images/x2border_active.png) 2 stretch;
 	-o-border-image: url(images/x2border_active.png) 2 stretch;
-	border-image: url(images/x2border_active.png) 2 fill stretch;
+	border-image: url(images/x2border_active.png) 2 stretch;
 }
 
 .bx_catalog_top_home .bx_item_detail_size .bx_size ul li.bx_missing .cnt{border: 1px solid #c0cfda !important}
@@ -649,7 +649,7 @@
 	-webkit-border-image: url(images/x2border.png) 2 stretch;
 	-moz-border-image: url(images/x2border.png) 2 stretch;
 	-o-border-image: url(images/x2border.png) 2 stretch;
-	border-image: url(images/x2border.png) 2 fill stretch;
+	border-image: url(images/x2border.png) 2 stretch;
 }
 .bx_catalog_top_home .bx_item_detail_scu .bx_scu ul li:hover .cnt{border: 1px solid #006cc0}
 .bx_catalog_top_home .bx_item_detail_scu .bx_scu ul li:active .cnt,
@@ -677,7 +677,7 @@
 	-webkit-border-image: url(images/x2border_active.png) 2 stretch;
 	-moz-border-image: url(images/x2border_active.png) 2 stretch;
 	-o-border-image: url(images/x2border_active.png) 2 stretch;
-	border-image: url(images/x2border_active.png) 2 fill stretch;
+	border-image: url(images/x2border_active.png) 2 stretch;
 }
 .bx_catalog_top_home .bx_item_detail_scu .bx_scu ul li .cnt .cnt_item{
 	position: absolute;
