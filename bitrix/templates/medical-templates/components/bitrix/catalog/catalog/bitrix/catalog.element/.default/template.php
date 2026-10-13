@@ -123,7 +123,7 @@ $this->setFrameMode(true);
 		</div>
 		<?endif?>
 
-		<?if($arResult['PROPERTIES']['CML2_ATTRIBUTES']['DESCRIPTION'][0]:?>
+		<?if($arResult['PROPERTIES']['CML2_ATTRIBUTES']['DESCRIPTION'][0]):?>
 		<a href="#" class="tabs__nav">Характеристики</a>
 		<div class="tabs__content text">
 			<table>
