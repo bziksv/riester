@@ -14,6 +14,15 @@ Allow: /catalog/pulsoksimetry-riester-germaniya/pulsoksimetr-1905-ri-fox-riester
 ####################################
 ####################################
 Disallow: */index.php
+Disallow: */content.php
+Disallow: /about/content.php
+Disallow: /catalog/sidebar.php
+Disallow: /dostavka/content.php
+Disallow: /kontakty/content.php
+Disallow: /oplata/content.php
+Disallow: /klientam/kak-zakazat/content.php
+Disallow: /klientam/otvety-na-voprosy/content.php
+Disallow: /klientam/content.php
 Disallow: /bitrix/
 Disallow: /*show_include_exec_time=
 Disallow: /*show_page_exec_time=
