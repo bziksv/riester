@@ -78,6 +78,9 @@ function riester_sanitize_html_content($html, $pageH1 = null)
         '$1',
         $html
     );
+    // </figure></p> / <hr></p> — block ended <p> already (HTML5) → drop stray </p>
+    $html = preg_replace('#(</(?:figure|table|form|blockquote)>)\s*</p>#iu', '$1', $html);
+    $html = preg_replace('#(<hr\b[^>]*/?>)\s*</p>#iu', '$1', $html);
 
     // Headings with orphan </p>/<p> and/or media inside (editor leftovers)
     // e.g. <h2>Text: </p> <p> <img …></h2> → <h2>Text:</h2><img …>
@@ -494,13 +497,14 @@ function riester_sanitize_css_expand_vars($css)
         } else {
             return null;
         }
-        if (isset($vars[$name]) && $vars[$name] !== '') {
+        if (isset($vars[$name]) && $vars[$name] !== '' && strtolower($vars[$name]) !== 'initial') {
             return $vars[$name];
         }
-        if ($fallback !== null && $fallback !== '') {
+        if ($fallback !== null && $fallback !== '' && strtolower($fallback) !== 'initial') {
             return $fallback;
         }
-        return 'initial';
+        // Never emit bare "initial" — invalid in font shorthand for Yandex/W3C
+        return '';
     };
 
     // Replace innermost var(...) first (handles nested var and rgba() fallbacks)
@@ -547,7 +551,7 @@ function riester_sanitize_css_expand_vars($css)
             }
             $resolved = $resolveVarCall($bestInner);
             if ($resolved === null) {
-                $resolved = 'initial';
+                $resolved = '';
             }
             $text = substr($text, 0, $bestPos) . $resolved . substr($text, $bestEnd + 1);
         }
@@ -574,6 +578,31 @@ function riester_sanitize_css_expand_vars($css)
     $css = preg_replace('/--[A-Za-z0-9_-]+\s*:\s*[^;{}]+(?=\s*})/u', '', $css);
     $css = preg_replace('/:root\s*\{\s*\}/u', '', $css);
     $css = preg_replace('/;\s*;+/u', ';', $css);
+    return riester_sanitize_css_yandex_cleanup($css);
+}
+
+/**
+ * Fix leftovers after var() expansion that Yandex flags as CSS errors.
+ */
+function riester_sanitize_css_yandex_cleanup($css)
+{
+    // font: 13px initial / font: …/normal initial → sans-serif
+    $css = preg_replace('/\bfont\s*:\s*([^;{}]*?)\s*initial\b/i', 'font: $1 sans-serif', $css);
+    $css = preg_replace('/\bfont\s*:\s*sans-serif\b/i', 'font: 13px sans-serif', $css);
+    $css = preg_replace('/\bfont-family\s*:\s*initial\b/i', 'font-family: sans-serif', $css);
+    $css = preg_replace('/\bfont-weight\s*:\s*initial\b/i', 'font-weight: normal', $css);
+    $css = preg_replace('/\bborder-radius\s*:\s*initial\b/i', 'border-radius: 0', $css);
+    $css = preg_replace('/\bbackground\s*:\s*initial\b/i', 'background: transparent', $css);
+    $css = preg_replace('/\b(min-width|fill)\s*:\s*initial\b/i', '', $css);
+    // scrollbar-color needs 2 colors; after expansion often 1 rgba → drop (popup-only)
+    $css = preg_replace('/\s*scrollbar-color\s*:\s*[^;{}]+;?/i', '', $css);
+    $css = preg_replace('/\s*scrollbar-width\s*:\s*[^;{}]+;?/i', '', $css);
+    // Empty / broken declarations left by empty var() replacement
+    $css = preg_replace('/\b[a-z-]+\s*:\s*;/i', '', $css);
+    $css = preg_replace('/\b[a-z-]+\s*:\s*!\s*important;?/i', '', $css);
+    $css = preg_replace('/:\s+/', ': ', $css);
+    $css = preg_replace('/\s{2,}/', ' ', $css);
+    $css = preg_replace('/;\s*;+/', ';', $css);
     return $css;
 }
 
@@ -605,6 +634,8 @@ function riester_sanitize_page_css(&$content)
                 $css
             );
             $css = riester_sanitize_css_expand_vars($css);
+            // expand_vars no-ops when no "--"; still clean scrollbar / initial noise
+            $css = riester_sanitize_css_yandex_cleanup($css);
             return $m[1] . $css . $m[3];
         },
         $content
@@ -642,6 +673,13 @@ function riester_sanitize_drop_orphan_closings($html)
 
     $voidish = array('br' => true, 'hr' => true, 'img' => true, 'meta' => true, 'input' => true, 'link' => true);
     $track = array('p' => true, 'li' => true, 'ul' => true, 'ol' => true);
+    // HTML5: these close an open <p> (so a following </p> is orphan)
+    $closesP = array(
+        'p' => true, 'div' => true, 'ul' => true, 'ol' => true, 'table' => true,
+        'form' => true, 'figure' => true, 'blockquote' => true, 'hr' => true,
+        'h1' => true, 'h2' => true, 'h3' => true, 'h4' => true, 'h5' => true, 'h6' => true,
+        'section' => true, 'article' => true, 'aside' => true, 'header' => true, 'footer' => true,
+    );
     $stack = array();
     $out = '';
     $offset = 0;
@@ -660,6 +698,14 @@ function riester_sanitize_drop_orphan_closings($html)
 
         $isClose = (isset($tagHtml[1]) && $tagHtml[1] === '/');
         $isSelf = (!$isClose && (substr($tagHtml, -2) === '/>' || isset($voidish[$tagName])));
+
+        // Close <p> before blocks that cannot nest in <p>
+        if (!$isClose && isset($closesP[$tagName])) {
+            while (!empty($stack) && end($stack) === 'p') {
+                array_pop($stack);
+                $out .= '</p>';
+            }
+        }
 
         if ($isClose && isset($track[$tagName])) {
             $idx = null;
@@ -682,13 +728,6 @@ function riester_sanitize_drop_orphan_closings($html)
         }
 
         if (!$isClose && !$isSelf && isset($track[$tagName])) {
-            // auto-close <p> before block / another <p>
-            if ($tagName === 'p' || $tagName === 'ul' || $tagName === 'ol') {
-                while (!empty($stack) && end($stack) === 'p') {
-                    array_pop($stack);
-                    $out .= '</p>';
-                }
-            }
             // <li> closes previous <li>
             if ($tagName === 'li') {
                 while (!empty($stack) && end($stack) === 'li') {

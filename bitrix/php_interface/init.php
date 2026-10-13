@@ -15,12 +15,15 @@ AddEventHandler('main', 'OnBeforeProlog', function () {
 	}
 	$done = true;
 	$cur = (string)COption::GetOptionString('arturgolubev.cssinliner', 'exceptions', '');
-	if (strpos($cur, '/bitrix/js/ui/') === false) {
-		COption::SetOptionString(
-			'arturgolubev.cssinliner',
-			'exceptions',
-			trim($cur . "\n/bitrix/js/ui/\n/bitrix/css/ui/")
-		);
+	$need = array('/bitrix/js/ui/', '/bitrix/css/ui/', '/bitrix/js/main/popup');
+	$add = '';
+	foreach ($need as $path) {
+		if (strpos($cur, $path) === false) {
+			$add .= "\n" . $path;
+		}
+	}
+	if ($add !== '') {
+		COption::SetOptionString('arturgolubev.cssinliner', 'exceptions', trim($cur . $add));
 	}
 });
 
