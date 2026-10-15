@@ -14,7 +14,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:image" content="path/to/image.jpg">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="120x120">
     <link rel="shortcut icon" href="<?=SITE_TEMPLATE_PATH?>/img/favicon/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/favicon.png" sizes="120x120">
 
     <link rel="stylesheet" href="<?=SITE_TEMPLATE_PATH?>/css/fonts.css">
     <link rel="stylesheet" href="<?=SITE_TEMPLATE_PATH?>/css/jquery-ui/jquery-ui.css">
