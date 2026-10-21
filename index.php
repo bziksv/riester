@@ -98,8 +98,8 @@ $APPLICATION->SetTitle("Riester - поставки медицинской тех
                     $arHomeSectionFour = array_slice($arHomeSection,0,4,true);
                 }
                 ?>
+                <? if(!empty($arHomeSectionFour)): ?>
                 <div class="categories">
-                    <? if(isset($arHomeSectionFour)): ?>
                         <?
                         foreach($arHomeSectionFour as $del => $section):
                         unset($arHomeSection[$del]);
@@ -111,8 +111,8 @@ $APPLICATION->SetTitle("Riester - поставки медицинской тех
                             </span>
                             </a>
                         <?endforeach;?>
-                    <? endif; ?>
                 </div>
+                <? endif; ?>
 
                 <div class="full-slider">
 
@@ -190,8 +190,8 @@ $APPLICATION->SetTitle("Riester - поставки медицинской тех
 
                 </div>
 
+                <? if(!empty($arHomeSection)): ?>
                 <div class="categories">
-                    <? if(isset($arHomeSection)): ?>
                         <? foreach($arHomeSection as $section): ?>
                             <a href="<?=$section['SECTION_PAGE_URL']?>" class="categories__item">
                             <span class="categories__item_wrapper">
@@ -200,8 +200,8 @@ $APPLICATION->SetTitle("Riester - поставки медицинской тех
                             </span>
                             </a>
                         <?endforeach;?>
-                    <? endif; ?>
                 </div>
+                <? endif; ?>
                 <hr class="hr">
 
                 <div class="title">Новинки</div>

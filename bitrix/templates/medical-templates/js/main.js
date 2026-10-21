@@ -1,5 +1,25 @@
 "use strict";
 $(function() {
+    function fitSliderToOuter($ul) {
+        if (!$ul || !$ul.length) return;
+        var $outer = $ul.closest(".lSSlideOuter");
+        if (!$outer.length) return;
+        var w = Math.round($outer.width());
+        if (!w) return;
+        var $slides = $ul.children(".lslide");
+        var item = 1;
+        var bw = window.innerWidth || document.documentElement.clientWidth;
+        if ($ul.hasClass("goods__slider")) {
+            if (bw >= 991) item = 4;
+            else if (bw >= 768) item = 3;
+            else if (bw >= 480) item = 2;
+            else item = 1;
+        }
+        var slideW = Math.floor(w / item);
+        $slides.css({ width: slideW + "px", "margin-right": "0px" });
+        $ul.css("width", $slides.length * slideW + "px");
+    }
+
     $(".slider__wrapper").lightSlider({
         adaptiveHeight: !0,
         item: 1,
@@ -10,40 +30,85 @@ $(function() {
         enableDrag: false,
         prevHtml: '<i class="icon-arrow_prev"></i>',
         nextHtml: '<i class="icon-arrow_next"></i>'
-    }), $(".full-slider__wrapper").lightSlider({
-        adaptiveHeight: !0,
-        item: 1,
-        slideMargin: 10,
-        pager: !1,
-        enableDrag: !1,
-        prevHtml: '<i class="icon-arrow_prev"></i>',
-        nextHtml: '<i class="icon-arrow_next"></i>'
-    }), $(".goods__slider").lightSlider({
-        adaptiveHeight: !0,
-        item: 4,
-        loop:true,
-        slideMargin: 0,
-        pager: !1,
-        enableDrag: !1,
-        prevHtml: '<i class="icon-arrow_prev"></i>',
-        nextHtml: '<i class="icon-arrow_next"></i>',
-        responsive: [{
-            breakpoint: 991,
-            settings: {
-                item: 3
+    }), function() {
+        var $full = $(".full-slider__wrapper");
+        if (!$full.length) return;
+        var fullSlider = $full.lightSlider({
+            adaptiveHeight: !0,
+            item: 1,
+            slideMargin: 0,
+            pager: !1,
+            enableDrag: !1,
+            prevHtml: '<i class="icon-arrow_prev"></i>',
+            nextHtml: '<i class="icon-arrow_next"></i>',
+            onSliderLoad: function() {
+                fitSliderToOuter($full);
+                $full.find("img").on("load", function() {
+                    fitSliderToOuter($full);
+                    if (fullSlider && typeof fullSlider.refresh === "function") {
+                        fullSlider.refresh();
+                        fitSliderToOuter($full);
+                    }
+                });
             }
-        }, {
-            breakpoint: 768,
-            settings: {
-                item: 2
+        });
+        fitSliderToOuter($full);
+        $(window).on("load resize", function() {
+            if (fullSlider && typeof fullSlider.refresh === "function") {
+                fullSlider.refresh();
             }
-        }, {
-            breakpoint: 480,
-            settings: {
-                item: 1
+            fitSliderToOuter($full);
+        });
+    }(), function() {
+        var $goods = $(".goods__slider");
+        if (!$goods.length) return;
+        var goodsSlider = $goods.lightSlider({
+            adaptiveHeight: !0,
+            item: 4,
+            loop: true,
+            slideMargin: 0,
+            pager: !1,
+            enableDrag: !1,
+            prevHtml: '<i class="icon-arrow_prev"></i>',
+            nextHtml: '<i class="icon-arrow_next"></i>',
+            responsive: [{
+                breakpoint: 991,
+                settings: {
+                    item: 3,
+                    slideMargin: 0
+                }
+            }, {
+                breakpoint: 768,
+                settings: {
+                    item: 2,
+                    slideMargin: 0
+                }
+            }, {
+                breakpoint: 480,
+                settings: {
+                    item: 1,
+                    slideMargin: 0
+                }
+            }],
+            onSliderLoad: function() {
+                fitSliderToOuter($goods);
+                $goods.find("img").on("load", function() {
+                    fitSliderToOuter($goods);
+                    if (goodsSlider && typeof goodsSlider.refresh === "function") {
+                        goodsSlider.refresh();
+                        fitSliderToOuter($goods);
+                    }
+                });
             }
-        }]
-    }), $(".cart__slider").lightSlider({
+        });
+        fitSliderToOuter($goods);
+        $(window).on("load resize", function() {
+            if (goodsSlider && typeof goodsSlider.refresh === "function") {
+                goodsSlider.refresh();
+            }
+            fitSliderToOuter($goods);
+        });
+    }(), $(".cart__slider").lightSlider({
         prevHtml: '<i class="icon-arrow_prev"></i>',
         nextHtml: '<i class="icon-arrow_next"></i>',
         gallery: true,

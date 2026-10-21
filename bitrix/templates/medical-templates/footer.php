@@ -41,8 +41,8 @@
             <div class="footer__col flex-2">
                 <div class="footer__copy icon-copyright"><?=date("Y")?> Все права защищены.</div>
 				<br>
-                <a href="https://prime-ltd.su/" target="_blank" style="position: relative; right: 11px;">
-  					<img src="https://prime-ltd.su/logo/white.svg" style="width: 70%; height: auto;" title="Продвижение сайтов" alt="Продвижение сайтов">
+                <a href="https://prime-ltd.su/" target="_blank" class="footer__partner" rel="noopener">
+  					<img src="https://prime-ltd.su/logo/white.svg" class="footer__partner-logo" title="Продвижение сайтов" alt="Продвижение сайтов">
 				</a>
             </div>
         </div>

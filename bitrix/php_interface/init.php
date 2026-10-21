@@ -15,6 +15,7 @@ AddEventHandler('main', 'OnEndBufferContent', function (&$content) {
 }, 610);
 
 // Keep Bitrix UI design-tokens out of cssinliner (CSS variables → Yandex Parse Error)
+// Keep header logo out of arturgolubev.lazyload (.container img was replacing it with pixel.gif)
 AddEventHandler('main', 'OnBeforeProlog', function () {
 	static $done = false;
 	if ($done || !function_exists('COption')) {
@@ -31,6 +32,12 @@ AddEventHandler('main', 'OnBeforeProlog', function () {
 	}
 	if ($add !== '') {
 		COption::SetOptionString('arturgolubev.cssinliner', 'exceptions', trim($cur . $add));
+	}
+
+	// arturgolubev.lazyload often leaves pixel.gif and never swaps data-src
+	// (logo, hero/product sliders, sidebar banners). Keep it off.
+	if (COption::GetOptionString('arturgolubev.lazyload', 'enable', 'N') !== 'N') {
+		COption::SetOptionString('arturgolubev.lazyload', 'enable', 'N');
 	}
 });
 
