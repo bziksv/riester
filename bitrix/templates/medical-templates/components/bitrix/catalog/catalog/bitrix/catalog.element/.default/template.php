@@ -36,7 +36,7 @@ $this->setFrameMode(true);
 			<div class="cart__alert">new</div>
 
 			<ul class="cart__slider">
-				<? foreach($arResult['PHOTO'] as $photo):?>
+				<? foreach(($arResult['PHOTO'] ?? []) as $photo):?>
 					<?
 					$arWaterMark = Array(
 						array(
@@ -61,22 +61,41 @@ $this->setFrameMode(true);
 		</div>
 
 		<div class="cart__content">
-			<? if($arResult['PROPERTIES']['CML2_ARTICLE']['VALUE']): ?>
+			<?
+			$articleDescs = $arResult['PROPERTIES']['ARTICLS']['DESCRIPTION'] ?? null;
+			if (!is_array($articleDescs)) {
+				$articleDescs = [];
+			}
+			$articleValues = $arResult['PROPERTIES']['ARTICLS']['VALUE'] ?? null;
+			if (!is_array($articleValues)) {
+				$articleValues = ($articleValues !== null && $articleValues !== '') ? [$articleValues] : [];
+			}
+			$priceValues = $arResult['PROPERTIES']['PRICES']['VALUE'] ?? null;
+			if (!is_array($priceValues)) {
+				$priceValues = ($priceValues !== null && $priceValues !== '') ? [$priceValues] : [];
+			}
+			$oldPrices = $arResult['PRICES']['BASE']['OLD'] ?? [];
+			if (!is_array($oldPrices)) {
+				$oldPrices = [];
+			}
+			$priceCurrency = $arResult['PRICES']['BASE']['CURRENCY'] ?? 'RUB';
+			?>
+			<? if(!empty($arResult['PROPERTIES']['CML2_ARTICLE']['VALUE'])): ?>
 			<p class="article">Арт: <?=$arResult['PROPERTIES']['CML2_ARTICLE']['VALUE']?></p>
 			<br>
-				<?if($arResult['PROPERTIES']['ARTICLS']['DESCRIPTION'][0]):?>
+				<?if(!empty($articleDescs[0])):?>
 				<p>Варианты:</p>
 				<div class="cart__wrapper">
-					<?foreach($arResult['PROPERTIES']['ARTICLS']['DESCRIPTION'] as $val => $art):?>
+					<?foreach($articleDescs as $val => $art):?>
 					<label class="cart__label">
-						<input type="radio" name="color" data-old-price="<?=CurrencyFormat($arResult['PRICES']['BASE']['OLD'][$val],"RUB");?>" data-price="Цена <?=CurrencyFormat($arResult['PROPERTIES']['PRICES']['VALUE'][$val],$arResult['PRICES']['BASE']['CURRENCY'])?>" class="cart__radio" <?=($val == 0) ? "checked" : "";?> value="<?=$arResult['PROPERTIES']['ARTICLS']['VALUE'][$val]?>"><i></i>
+						<input type="radio" name="color" data-old-price="<?=CurrencyFormat($oldPrices[$val] ?? 0,"RUB");?>" data-price="Цена <?=CurrencyFormat($priceValues[$val] ?? 0,$priceCurrency)?>" class="cart__radio" <?=($val == 0) ? "checked" : "";?> value="<?=$articleValues[$val] ?? ''?>"><i></i>
 						<?=$art?>
 					</label>
 					<?endforeach?>
 				</div>
 				<?else:?>
 					<span>
-						<input type="radio" name="color" data-old-price="<?=CurrencyFormat($arResult['PRICES']['BASE']['OLD'][0],"RUB");?>" data-price="Цена <?=CurrencyFormat($arResult['PROPERTIES']['PRICES']['VALUE'][0],$arResult['PRICES']['BASE']['CURRENCY'])?>" class="cart__radio" checked value="<?=$arResult['PROPERTIES']['ARTICLS']['VALUE'][0]?>">
+						<input type="radio" name="color" data-old-price="<?=CurrencyFormat($oldPrices[0] ?? 0,"RUB");?>" data-price="Цена <?=CurrencyFormat($priceValues[0] ?? 0,$priceCurrency)?>" class="cart__radio" checked value="<?=$articleValues[0] ?? ''?>">
 					</span>
 				<? endif; ?>
 			<? endif; ?>
@@ -123,25 +142,42 @@ $this->setFrameMode(true);
 		</div>
 		<?endif?>
 
-		<?if($arResult['PROPERTIES']['CML2_ATTRIBUTES']['DESCRIPTION'][0]):?>
+		<?
+		$attrDescriptions = $arResult['PROPERTIES']['CML2_ATTRIBUTES']['DESCRIPTION'] ?? null;
+		if (!is_array($attrDescriptions)) {
+			$attrDescriptions = [];
+		}
+		$attrValues = $arResult['PROPERTIES']['CML2_ATTRIBUTES']['~VALUE'] ?? ($arResult['PROPERTIES']['CML2_ATTRIBUTES']['VALUE'] ?? null);
+		if (!is_array($attrValues)) {
+			$attrValues = [];
+		}
+		$complectRaw = $arResult['PROPERTIES']['CML2_COMPLECT']['~VALUE']
+			?? ($arResult['PROPERTIES']['CML2_COMPLECT']['VALUE'] ?? null);
+		if (is_array($complectRaw)) {
+			$complectText = (string)($complectRaw['TEXT'] ?? '');
+		} else {
+			$complectText = is_string($complectRaw) ? $complectRaw : '';
+		}
+		?>
+		<?if(!empty($attrDescriptions[0])):?>
 		<a href="#" class="tabs__nav">Характеристики</a>
 		<div class="tabs__content text">
 			<table>
-				<? foreach($arResult['PROPERTIES']['CML2_ATTRIBUTES']['DESCRIPTION'] as $key => $attr): ?>
+				<? foreach($attrDescriptions as $key => $attr): ?>
 				<tr>
 					<td><?=$attr?></td>
-					<td><?=$arResult['PROPERTIES']['CML2_ATTRIBUTES']['~VALUE'][$key]?></td>
+					<td><?=$attrValues[$key] ?? ''?></td>
 				</tr>
 				<?endforeach;?>
 			</table>
 		</div>
 		<?endif?>
 
-		<?if($arResult['PROPERTIES']['CML2_COMPLECT']['VALUE']['TEXT']):?>
+		<?if($complectText !== ''):?>
 		<a href="#" class="tabs__nav">Комплектация</a>
 		<div class="tabs__content text">
 			<?= riester_sanitize_html_content(
-				$arResult['PROPERTIES']['CML2_COMPLECT']['~VALUE']['TEXT'],
+				$complectText,
 				!empty($arResult['IPROPERTY_VALUES']['ELEMENT_PAGE_TITLE'])
 					? $arResult['IPROPERTY_VALUES']['ELEMENT_PAGE_TITLE']
 					: $arResult['NAME']

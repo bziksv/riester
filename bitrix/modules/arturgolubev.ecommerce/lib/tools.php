@@ -7,7 +7,7 @@ class Tools {
 	const MODULE_ID = 'arturgolubev.ecommerce';
 	var $MODULE_ID = 'arturgolubev.ecommerce';
 	
-	function checkDisable(){
+	public static function checkDisable(){
 		if(!isset(UTools::$storage["main"]["disable"]))
 		{
 			UTools::setStorage("main", "disable",
@@ -19,12 +19,12 @@ class Tools {
 		return $r;
 	}
 	
-	function isOrderPage(){
+	public static function isOrderPage(){
 		global $APPLICATION;
 		return (UTools::getSiteSettingEx('order_page') && $APPLICATION->GetCurPage(false) == UTools::getSiteSettingEx('order_page'));
 	}
 	
-	function textSafeMode($text, $htsc = false){
+	public static function textSafeMode($text, $htsc = false){
 		if($htsc) $text = htmlspecialcharsbx($text);
 		
 		$text = str_replace(array("'", '"'), array("", ""), $text);
@@ -33,7 +33,7 @@ class Tools {
 		return $text;
 	}
 	
-	function addScriptToHead($result){
+	public static function addScriptToHead($result){
 		$r = UTools::getStorage("scripts", "move_footer");
 		$r .= str_replace(array("\r\n", "\r", "\n"), '',  $result);
 		

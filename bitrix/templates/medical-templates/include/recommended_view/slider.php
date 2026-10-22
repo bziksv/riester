@@ -34,10 +34,11 @@
                             </div>
                             <span data-text="за штуку"><?=($arItem["JS_HIDE"] == "N") ? "за штуку" : "" ?></span>
                         </div>
-                        <? if(count($arItem['ARTICLS']['VALUE']) > 1): ?>
-                            <a href="javascript:void(0)" class="goods__basket icon-basket" onclick="$('#more_option_<?=$arItem[ID]?>').bPopup({zIndex:1000});"></a>
+                        <? $articles = $arItem['ARTICLS']['VALUE'] ?? []; if (!is_array($articles)) { $articles = ($articles !== null && $articles !== '') ? [$articles] : []; } ?>
+                        <? if(count($articles) > 1): ?>
+                            <a href="javascript:void(0)" class="goods__basket icon-basket" onclick="$('#more_option_<?=$arItem['ID']?>').bPopup({zIndex:1000});"></a>
                         <?else:?>
-                            <input type="hidden" name="article" value="<?=$arItem['ARTICLS']['VALUE'][0]?>">
+                            <input type="hidden" name="article" value="<?=$articles[0] ?? ''?>">
                             <a href="javascript:void(0)" class="goods__basket icon-basket" onclick="addToBasket2(<?=$arItem['ID']?>, $('#<?=$counterId?>').val(),this);"></a>
                         <?endif;?>
                     </div>

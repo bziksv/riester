@@ -7,18 +7,22 @@
 <ul class="catalog__menu">
 <?
 $previousLevel = 0;
+$deleteIndex = $arResult['PROPERTIES']['UF_DELETE_INDEX'] ?? [];
+if (!is_array($deleteIndex)) {
+	$deleteIndex = [];
+}
 
 foreach($arResult as $key => $arItem):
-if(!$arItem["TEXT"]) continue;
+if(!is_array($arItem) || empty($arItem["TEXT"])) continue;
 ?>
 	<?if ($previousLevel && $arItem["DEPTH_LEVEL"] < $previousLevel):?>
 		<?=str_repeat("</ul></li>", ($previousLevel - $arItem["DEPTH_LEVEL"]));?>
 	<?endif?>
 
 	<?if ($arItem["IS_PARENT"]):?>
-			<li<?if($arItem["CHILD_SELECTED"] !== true):?> <?endif?> class="catalog__item">
+			<li class="catalog__item">
 
-                <? if(in_array($arItem["PARAMS"]["ID"], $arResult['PROPERTIES']['UF_DELETE_INDEX'])): ?>
+                <? if(in_array($arItem["PARAMS"]["ID"] ?? null, $deleteIndex, true)): ?>
                     <a href="<?=$arItem["LINK"]?>" class="catalog__link" data-text="<?=$arItem["TEXT"]?>"></a>
                 <? else: ?>
                     <a href="<?=$arItem["LINK"]?>" class="catalog__link"><?=$arItem["TEXT"]?></a>
@@ -28,9 +32,9 @@ if(!$arItem["TEXT"]) continue;
 				<ul class="catalog__submenu">
 	<?else:?>
 
-		<?if ($arItem["PERMISSION"] > "D"):?>
+		<?if (($arItem["PERMISSION"] ?? '') > "D"):?>
 				<li <?if($arItem["DEPTH_LEVEL"] == 1):?>class="catalog__item"<?endif;?>>
-                    <? if(in_array($arItem["PARAMS"]["ID"], $arResult['PROPERTIES']['UF_DELETE_INDEX'])): ?>
+                    <? if(in_array($arItem["PARAMS"]["ID"] ?? null, $deleteIndex, true)): ?>
                         <a href="<?=$arItem["LINK"]?>" class="<?if($arItem["DEPTH_LEVEL"] > 1):?>catalog__submenu_link<?else:?>catalog__link<?endif;?>" data-text="<?=$arItem["TEXT"]?>"></a>
                     <? else: ?>
                         <a href="<?=$arItem["LINK"]?>" class="<?if($arItem["DEPTH_LEVEL"] > 1):?>catalog__submenu_link<?else:?>catalog__link<?endif;?>"><?=$arItem["TEXT"]?></a>

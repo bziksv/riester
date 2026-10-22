@@ -2,9 +2,14 @@
 set -e
 cd "$(dirname "$0")/.."
 SITE_ROOT="$(pwd)"
-PHP74=/opt/homebrew/opt/php@7.4
+PHP82=/opt/homebrew/opt/php@8.2
 NGINX=/opt/homebrew/bin/nginx
 RUN_DIR="$SITE_ROOT/.local/run"
+
+if [ ! -x "$PHP82/sbin/php-fpm" ]; then
+  echo "PHP 8.2 not found: $PHP82 (brew install php@8.2)"
+  exit 1
+fi
 
 mkdir -p "$RUN_DIR"
 
@@ -57,7 +62,7 @@ sed -i '' "s|RUN_DIR|$RUN_DIR|g" "$RUN_DIR/php.ini"
 
 export PHPRC="$RUN_DIR/php.ini"
 
-"$PHP74/sbin/php-fpm" -y "$RUN_DIR/fpm.conf" &
+"$PHP82/sbin/php-fpm" -y "$RUN_DIR/fpm.conf" &
 FPM_PID=$!
 sleep 1
 
@@ -70,9 +75,10 @@ fi
 sleep 1
 
 HTTP=$(curl -sS -o /tmp/riester-check.html -w '%{http_code}' --max-time 60 http://127.0.0.1:8103/ || echo 000)
+PHP_VER=$("$PHP82/bin/php" -r 'echo PHP_VERSION;')
 
 echo "soft http://127.0.0.1:8103/ → HTTP $HTTP"
-echo "php-fpm :9103 (ondemand, max 2 workers, 512M)"
+echo "php-fpm :9103 (PHP $PHP_VER, ondemand, max 2 workers, 512M)"
 echo "stop: ./scripts/stop-dev.sh"
 
 if [ "$HTTP" = "000" ]; then

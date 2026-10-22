@@ -112,11 +112,11 @@ git add … && git commit -m "…" && git push origin main   # после пра
 - **RedBox visit** — скрипт `prime.visit.js` в footer шаблона
 - **1С** — `hand1CtoSite.php` (обмен с 1С)
 
-## PHP 8 и модуль lazyload
+## PHP
 
-На **prod** обычно PHP 7.x. Локально используем **PHP 7.4** (`/opt/homebrew/opt/php@7.4`) — модуль `arturgolubev.lazyload` несовместим с PHP 8.3 (curly braces, static callbacks).
+На **prod** обычно PHP 7.x. Локально — **PHP 8.2** (`/opt/homebrew/opt/php@8.2`, `./scripts/start-dev.sh`).
 
-При необходимости PHP 8: в `bitrix/modules/arturgolubev.lazyload/` уже частично исправлен `phpQuery-onefile.php` и статические обработчики в `include.php`; полная совместимость потребует доработки `Unitools`.
+Модуль `arturgolubev.lazyload` на PHP 8 ломается (`create_function` / phpQuery) — в `bitrix/php_interface/init.php` он принудительно выключен (`enable=N`).
 
 ## Проверка после изменений
 

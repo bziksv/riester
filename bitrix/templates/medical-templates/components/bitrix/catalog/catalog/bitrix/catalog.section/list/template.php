@@ -64,14 +64,15 @@ if(empty($arResult['ITEMS']))
 						<input type="text" class="goods__counter_input" id="goods__counter_input_<?=$item['ID']?>" value="1" readonly>
 						<div class="goods__counter_add">+</div>
 					</div>
-                    <? if(count($item['PROPERTIES']['ARTICLS']['VALUE']) > 1): ?>
+                    <? $articles = $item['PROPERTIES']['ARTICLS']['VALUE'] ?? []; if (!is_array($articles)) { $articles = ($articles !== null && $articles !== '') ? [$articles] : []; } ?>
+                    <? if(count($articles) > 1): ?>
                         <? if($let >= $arResult["UF_HIDE_BUY"] && !is_null($arResult["UF_HIDE_BUY"])): ?>
                             <a href="javascript:void(0)" class="goods__buy" onclick="$('.more_options').bPopup({ zIndex:1000, loadUrl: '/ajax/popup_option.php?ID=<?=$item['ID']?>' }).css({width: '100%'});" data-text="Купить"></a>
                         <? else: ?>
                             <a href="javascript:void(0)" class="goods__buy" onclick="$('.more_options').bPopup({ zIndex:1000, loadUrl: '/ajax/popup_option.php?ID=<?=$item['ID']?>' }).css({width: '100%'});">Купить</a>
                         <? endif; ?>
                     <?else:?>
-                        <input type="hidden" name="article" value="<?=$item['PROPERTIES']['ARTICLS']['VALUE'][0]?>">
+                        <input type="hidden" name="article" value="<?=$articles[0] ?? ''?>">
                         <? if($let >= $arResult["UF_HIDE_BUY"] && !is_null($arResult["UF_HIDE_BUY"])): ?>
                             <a href="javascript:void(0)" class="goods__buy" onclick="addToBasket2(<?=$item['ID']?>, $('#goods__counter_input_<?=$item['ID']?>').val(),this);" data-text="Купить"></a>
                         <? else: ?>
