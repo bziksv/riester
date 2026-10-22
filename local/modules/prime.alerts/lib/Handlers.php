@@ -145,13 +145,10 @@ class Handlers
 			return;
 		}
 
-		$isNew = $event->getParameter('IS_NEW');
-		$orderId = (int)$order->getId();
-		$looksNew = ($isNew === true) || $orderId <= 0 || (method_exists($order, 'isNew') && $order->isNew());
-		if (!$looksNew) {
-			return;
-		}
-
+		// Always validate buyer e-mail on save (new and update).
+		// OnSaleOrderBeforeSaved does not pass IS_NEW; SOA may also set e-mail
+		// on a subsequent save after the order already has an ID — skipping
+		// updates let gmail through.
 		$email = self::orderEmail($order);
 		if ($email === '') {
 			return;
@@ -250,12 +247,36 @@ class Handlers
 	{
 		$collection = $order->getPropertyCollection();
 		if ($collection) {
-			foreach ($collection as $property) {
-				if (strtoupper((string)$property->getField('CODE')) === 'EMAIL') {
-					$email = trim((string)$property->getValue());
+			if (method_exists($collection, 'getUserEmail')) {
+				$emailProp = $collection->getUserEmail();
+				if ($emailProp) {
+					$email = trim((string)$emailProp->getValue());
 					if ($email !== '') {
 						return $email;
 					}
+				}
+			}
+
+			foreach ($collection as $property) {
+				$code = strtoupper((string)$property->getField('CODE'));
+				$isEmail = ((string)$property->getField('IS_EMAIL') === 'Y');
+				if (($code === '' || !$isEmail) && method_exists($property, 'getProperty')) {
+					$prop = $property->getProperty();
+					if (is_array($prop)) {
+						if ($code === '') {
+							$code = strtoupper((string)($prop['CODE'] ?? ''));
+						}
+						if (!$isEmail) {
+							$isEmail = (($prop['IS_EMAIL'] ?? 'N') === 'Y');
+						}
+					}
+				}
+				if ($code !== 'EMAIL' && !$isEmail) {
+					continue;
+				}
+				$email = trim((string)$property->getValue());
+				if ($email !== '') {
+					return $email;
 				}
 			}
 		}
@@ -264,7 +285,16 @@ class Handlers
 		if ($userId > 0) {
 			$rs = \CUser::GetByID($userId);
 			if ($user = $rs->Fetch()) {
-				return (string)($user['EMAIL'] ?? '');
+				$login = strtolower((string)($user['LOGIN'] ?? ''));
+				// Anonymous/technical stub e-mails are not the buyer's address
+				if (
+					$login === 'technical_boc'
+					|| strpos($login, 'technical_') === 0
+					|| strpos($login, 'anonymous') === 0
+				) {
+					return '';
+				}
+				return trim((string)($user['EMAIL'] ?? ''));
 			}
 		}
 

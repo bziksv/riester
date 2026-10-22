@@ -59,8 +59,8 @@ class Frontend
 			'noticeCheckout' => EmailPolicy::getNoticeHtml('checkout'),
 		];
 
-		$cssHref = '/local/modules/prime.alerts/assets/style.css?v=1.2.3';
-		$jsHref = '/local/modules/prime.alerts/assets/policy.js?v=1.2.3';
+		$cssHref = '/local/modules/prime.alerts/assets/style.css?v=1.2.4';
+		$jsHref = '/local/modules/prime.alerts/assets/policy.js?v=1.2.4';
 		$flash = '';
 		try {
 			$session = \Bitrix\Main\Application::getInstance()->getSession();
