@@ -33,8 +33,6 @@ $this->setFrameMode(true);
                 </div>
             <? endif; ?>
 
-			<div class="cart__alert">new</div>
-
 			<ul class="cart__slider">
 				<? foreach(($arResult['PHOTO'] ?? []) as $photo):?>
 					<?
@@ -186,11 +184,4 @@ $this->setFrameMode(true);
 		<?endif;?>
 
 	</div>
-
-
-
-
-
-
-
 
